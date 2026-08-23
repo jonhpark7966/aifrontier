@@ -1,0 +1,546 @@
+---
+episodeNumber: 111
+title: "Benchmark Leader Eliminated? Inside the Four-Way Dokpamo Race"
+description: "We unpack Korea's sovereign foundation-model (Dokpamo) selection and why benchmark leader Motif was eliminated, then explore Sutton's continual-learning vision, experiments that make design verifiable, and agent workflows."
+publishedAt: 2026-08-23
+duration: "1:28:31"
+youtubeId: "Q_Fzk7rkmsM"
+thumbnail: "https://i.ytimg.com/vi/Q_Fzk7rkmsM/maxresdefault.jpg"
+hosts:
+  - Chester Roh
+  - Seungjoon Choi
+  - Jonghyun Park
+chapters:
+  - time: "0:00"
+    title: "The Four-Way Dokpamo Race and the Three-Model Selection Issue"
+  - time: "2:03"
+    title: "Where the Dokpamo Candidates Stand on the AAII Benchmark"
+  - time: "4:03"
+    title: "Why First-Place Motif's Elimination Became Controversial"
+  - time: "6:27"
+    title: "Comparing the Scale and Training Resources of the Dokpamo Candidate Models"
+  - time: "8:20"
+    title: "Disappointment over Dataset Sources and Openness"
+  - time: "10:05"
+    title: "GPU Support Conditions and SK Telecom's Self-Funded Training Background"
+  - time: "13:01"
+    title: "Government Evaluation Criteria Seen Through Private Benchmarks and Qualitative Assessment"
+  - time: "15:06"
+    title: "An Ecosystem-Centered Evaluation Intent Beyond Model Performance"
+  - time: "19:43"
+    title: "The Public Evaluation Panel and the Korean-English Code-Switching 'Pangyo-eo' Controversy"
+  - time: "21:50"
+    title: "Real-World Testing of the Dokpamo Models from an Agent Workflow Perspective"
+  - time: "25:17"
+    title: "Live Hands-On Results and Motif vs. Solar Comparison"
+  - time: "29:32"
+    title: "Criteria for a Good Foundation Model Beyond Benchmarks"
+  - time: "31:11"
+    title: "Motif's Narrow Defeat and the Gap Between Public Rubrics and Industry Perspectives"
+  - time: "34:31"
+    title: "The Purpose of Sovereign AI and the Scope of an 'Independent' Model"
+  - time: "37:37"
+    title: "The Commoditization of AI and Why the State Invests in Dokpamo"
+  - time: "44:36"
+    title: "Model Release Pace and the Challenge of a Sustainable Ecosystem"
+  - time: "48:31"
+    title: "The Double-Edged Sword of Government Projects and Real Market Competition"
+  - time: "50:36"
+    title: "Frontier News on the Astra Training Pause, the Anthropic Debate, and Cancer Research"
+  - time: "52:43"
+    title: "The Richard Sutton Interview and the Vision of Continual Learning"
+  - time: "57:22"
+    title: "Augmented Transcript Reading and Zoomable Interface Experiments"
+  - time: "61:15"
+    title: "The Limits of Hill Climbing and Agent Workflows That See the Big Picture"
+  - time: "63:58"
+    title: "Experimenting with Proxy Metrics to Make Typesetting Verifiable"
+  - time: "66:28"
+    title: "Parametric Hangul Font Generation and the Difficulty of Evaluating Design"
+  - time: "70:59"
+    title: "Design Work That Requires Taste and the Limits of Evaluators"
+  - time: "75:19"
+    title: "Sutton's Vision of Running a 1T Model on 20 Watts"
+  - time: "77:45"
+    title: "The Structure of Work Through Auto Research and the Control Plane"
+  - time: "79:55"
+    title: "Extracting Editing Styles and Proxying Human Work"
+  - time: "82:39"
+    title: "Multi-Agent Iterative Evaluation and Changes in Personal Work Practices"
+  - time: "85:58"
+    title: "A Frontier-Grade Work Environment Enabled by Web Interfaces Alone"
+  - time: "87:51"
+    title: "Operator Agents and the Future of Work Automation"
+lang: "en"
+alternateSlug: null
+series: "main"
+---
+
+## The Four-Way Dokpamo Race and the Three-Model Selection Issue    *0:00*
+
+<span class="paragraph-timestamp" data-ts="0:00">0:00</span> **Chester Roh** Today, as we're recording, is August 22nd, 2026, a Saturday morning. The word frontier has been coming up quite often lately. Frontier models continued to push forward this week, still with no end in sight. In fact, the model known as GPT-6, Astra was deemed so dangerous that they decided to pause model training for two weeks, and Sam Altman personally shared news like this.
+
+<span class="paragraph-timestamp" data-ts="0:28">0:28</span> But there is a perception that becoming part of this frontier is the only way to survive, and there has also been discussion about the hardships one may endure when not being part of this frontier. Because of those hardships, an initiative was launched at the national level: the Independent Foundation Model initiative, known as Dokpamo. And this week, there was also an event related to Dokpamo in which three out of four were selected, and it seems to have generated a great deal of discussion. So Jonghyun, after thoroughly looking into the models related to Dokpamo, and examining them all, we would like to hear your thoughts on them as well. Our discussion may not be objective. That is because the very criteria used to evaluate models are not entirely objective, and these days, some say benchmarks are meaningless, and that models with high benchmark scores are not necessarily good models. Since there are opinions like these, we will probably begin this discussion from a highly subjective perspective ourselves.
+
+<span class="paragraph-timestamp" data-ts="1:26">1:26</span> We will first talk about Dokpamo today, and then hear about what Seungjoon has been working on lately. Everyone, in their own work and their own workflow, and in their own choice of models, is engaged in activities aimed at reaching some kind of frontier. It could be called a harness, or it could be called a methodology. It is a combination of many different things, and Seungjoon has been doing work to push his own frontier forward. We will hear about those aspects together as well. Then shall we get started? Dokpamo is a hot topic.
+
+
+## Where the Dokpamo Candidates Stand on the AAII Benchmark    *2:03*
+
+<span class="paragraph-timestamp" data-ts="2:03">2:03</span> **Jonghyun Park** You mentioned that benchmarks are not entirely objective indicators for evaluation, but they are still the most objective indicators available, so let us start here. It is called AAII. Artificial Analysis Intelligence Index. It is an index that combines multiple benchmarks, and if we were to express the performance of a model as a single number, this still seems to be the one people look at most often. As you can see here, starting from the top, we have Opus, Fable, Sol, Grok, Kimi, and so on, listed in descending order. There is a series of American and Chinese models that we refer to as frontier models, and around here, a Korean model called Motif appears for the first time. Next, numerically, is Qwen 3.8 27B, which is the smaller version of the model. The larger 2.4T version is further up, and we are positioned below it. Continuing further down, we can also see the TML Inkling model, NVIDIA Nemotron, and then Upstage's Solar, which is also Korean, SK Telecom's A.X K2, and LG AI Research's K-EXAONE. The models distributed around this range were the Dokpamo model candidates that the government is currently promoting heavily. So in terms of model rankings, this is roughly where they stand, I think that is how we can view it. For reference, outside the United States, China, and Korea, Mistral is the first model to appear here. Then, further down, there is Command A, and Cohere is somewhat ambiguous, but as far as I know, it is probably Canadian. Though if we consider North America as a whole, the distinction becomes somewhat ambiguous. In any case, this is the level we have reached.
+
+<span class="paragraph-timestamp" data-ts="3:51">3:51</span> I was curious about these models, so I personally tried them whenever I had the opportunity. This is a highly subjective evaluation.
+
+
+## Why First-Place Motif's Elimination Became Controversial    *4:03*
+
+<span class="paragraph-timestamp" data-ts="3:59">3:59</span> **Chester Roh** To give away the conclusion in advance, three out of the four models were selected. Motif was eliminated, while the other three companies advanced to the next round.
+
+<span class="paragraph-timestamp" data-ts="4:15">4:15</span> **Jonghyun Park** So when looking only at the benchmark scores, its score is overwhelmingly higher. There is about a ten-point gap between it and second place, and to put this ten-point gap into perspective, the difference between GPT-5.6 Sol and Luna is about ten points. But a model about ten points lower advanced, while the highest-ranked model was eliminated. This seems to be why it has become such a hot topic.
+
+<span class="paragraph-timestamp" data-ts="4:45">4:45</span> **Chester Roh** Shall we examine what happened from our perspective?
+
+<span class="paragraph-timestamp" data-ts="4:49">4:49</span> **Jonghyun Park** I think people are puzzled because the top-ranked model was eliminated. Until this opportunity arose, I naturally had never had a chance to try those models. They were only released recently, and they are difficult to try. So I was curious too, and for the same reason, people seem to be paying a lot of attention to the keyword benchmaxxing. That is because there are quite a few models that score highly on benchmarks but are disappointing in actual use. So I was curious whether a model with a high benchmark score would still be unsatisfactory when used firsthand, which is why I decided to try them myself.
+
+<span class="paragraph-timestamp" data-ts="5:23">5:23</span> Moreover, in a way, this model called Motif received attention for the first time through this selection, so even the name itself was new to me. In the case of the other models, Upstage, SK Telecom, and LG EXAONE were all models that had already been well-known, but this one suddenly appeared and became a hot topic, and became even more of a hot topic after it was eliminated, so I think that is how this model could be described. So I tried it myself.
+
+<span class="paragraph-timestamp" data-ts="5:49">5:49</span> Since this is quite subjective in its own way, I wanted to demonstrate how I tried it, and I wanted to leave the entire trajectory, so I deliberately did it live on our channel. So I also conducted the evaluation while chatting with the people watching the live stream: let's try this, let's try that, what do people think? I proceeded while gathering feedback like this, so as much as possible, within the limits of what I could do, I tried to evaluate it objectively.
+
+<span class="paragraph-timestamp" data-ts="6:16">6:16</span> **Chester Roh** On our sister channel, Sudoremove, Jonghyun personally hosted a live stream, and this was compiled based on those results.
+
+
+## Comparing the Scale and Training Resources of the Dokpamo Candidate Models    *6:27*
+
+<span class="paragraph-timestamp" data-ts="6:27">6:27</span> **Jonghyun Park** Let me begin with a quick summary. I briefly compiled only the things worth looking at to show what these models objectively look like, and the first thing people are probably most curious about is the model size. The model sizes are 300B, 750B, 680B, and around 200B. So these were models ranging in size from around 200B to 700B. Interestingly, the largest model had a low score. The smaller models actually scored better. So there was a discrepancy between model size and benchmark scores, and next, looking just at the context size,
+
+<span class="paragraph-timestamp" data-ts="7:07">7:07</span> only Solar has 1M. These days, many 1M models are being released, but almost all of these were 256K models.
+
+<span class="paragraph-timestamp" data-ts="7:15">7:15</span> There were also some distinctive aspects in terms of the models' internal architecture. In any case, everyone made their own minor modifications inside the Transformer in an effort to improve something.
+
+<span class="paragraph-timestamp" data-ts="7:28">7:28</span> The next thing I was curious about was, beyond the model size, how much training they had done. That is because the scale of this training, the model size, the data— how much data they used and how many tokens they trained on— are particularly difficult to access in places like Korea that are neither the United States nor China, which is why the government runs projects like this. So I was curious about the scale and investigated the number of pre-training tokens, and it seems they all trained on roughly 1 trillion tokens. For reference, in the case of Kimi, K2, which came out last year, was the previous-generation model. I remember it being trained on around 20 trillion tokens, based on what I saw in the paper, so that is roughly the scale involved. If it is 10 trillion, you could say they are keeping up quite well, even in terms of scale.
+
+
+## Disappointment over Dataset Sources and Openness    *8:20*
+
+<span class="paragraph-timestamp" data-ts="8:20">8:20</span> **Chester Roh** The sources of the datasets are interesting. They are all slightly different, and as befits the newest entrant, Motif used the NVIDIA Nemotron corpus the most.
+
+<span class="paragraph-timestamp" data-ts="8:32">8:32</span> **Jonghyun Park** Among the publicly available pre-training data we generally know of, the largest are Nemotron and Hugging Face's FineWeb2, and these seem to be regarded as the standard. Beyond that, the differences seem to have been in how well they used public-sector data, or how they took these datasets from FineWeb2 or Nemotron, curated and extracted them effectively, and compressed or synthesized them. Those seem to have been the main differences.
+
+<span class="paragraph-timestamp" data-ts="9:00">9:00</span> If we insist on simply classifying models as open-weight models or open-source models, we generally distinguish them to some extent by how much of the recipe has been disclosed, but the data sources did not seem especially transparent. I had been hoping for that. After all, everyone must have curated Korean-language data in some way, so I wondered how they did it, whether they synthesized it, and how they curated it. This may be further refined and disclosed over time. In any case, these are ultimately the things that create an ecosystem, so I had high hopes, but the information was not disclosed very thoroughly. I found those aspects disappointing.
+
+<span class="paragraph-timestamp" data-ts="9:42">9:42</span> And in terms of GPUs, based on B200s, they provided around 500 to 700 units. So all the training was done with those resources.
+
+<span class="paragraph-timestamp" data-ts="9:53">9:53</span> The next thing you mentioned was that SK Telecom initially did not receive this support. I do not know the details either, so could you explain the background?
+
+
+## GPU Support Conditions and SK Telecom's Self-Funded Training Background    *10:05*
+
+<span class="paragraph-timestamp" data-ts="10:05">10:05</span> **Chester Roh** This information is not confirmed, but SK Telecom was initially registered as a GPU provider, and there were conditions stating that GPU providers could not receive government support, while companies that did not receive support had no obligation to release their weights. I heard that this carrot-and-stick arrangement was linked together in that way. In SK Telecom's case, I heard that it would be brought back within the scope of government support in July. Until then, because it had not received government-funded GPUs, the company reportedly used its own funds to cover the training of this model.
+
+<span class="paragraph-timestamp" data-ts="10:47">10:47</span> So I heard that it spent an enormous amount of money, and rumors about the amount are circulating, but since they are unconfirmed, I do not think I can mention it. But now that it has become a three-way race, SK Telecom will also receive government GPU support, as I understand it.
+
+<span class="paragraph-timestamp" data-ts="11:07">11:07</span> **Jonghyun Park** Yes, I understand. In any case, the companies here could be seen as companies that only build models, but SK Telecom also supplies GPU servers. In any case, they all build infrastructure and models, but their positions within this ecosystem differ, and since those positions overlap, it seems that, to ensure fairness in the project, they put all those safeguards in place. For now, that's how I understand it. So I was curious about things like how many GPU-hours they had used, because among the actual expenses involved, that is one of the largest, so I wanted to know the cost, but precise figures for this weren't publicly available either.
+
+<span class="paragraph-timestamp" data-ts="11:47">11:47</span> So judging solely by the results, of course, experiments don't simply involve pressing a button once, running everything from beginning to end, and being done. Naturally, it doesn't work like that, but if you look at the active parameter count and then how many tokens were used for training, you can determine the amount of computation used during the pre-training stage of the overall training process. When calculated solely in this way, Motif and Solar Open 2, the two models with the highest scores, were actually smaller. That's when looking only at pre-training compute. We were able to work these things out in reverse with some simple calculations.
+
+<span class="paragraph-timestamp" data-ts="12:24">12:24</span> Then, one of the things that surprised me was that the Motif team reportedly has only about 30 people. So even though it's a startup, with a very small team, it managed to do this very well. I thought that was remarkable in itself. Building a model itself, building a good foundation model, requires an enormous number of GPUs and therefore costs a lot of money, but the actual workforce doesn't need to be that large. Even a small team can certainly do it. I think this served as evidence of that. This was one of the things we had all observed at frontier labs, and the same thing seems to have happened in Korea. When frontier labs recruit people, their market value can reach as much as $70 million per person, I suppose. Just as the articles report.
+
+
+## Government Evaluation Criteria Seen Through Private Benchmarks and Qualitative Assessment    *13:01*
+
+<span class="paragraph-timestamp" data-ts="13:13">13:13</span> **Chester Roh** It's known that this is something only a few people need to possess, almost like a recipe.
+
+<span class="paragraph-timestamp" data-ts="13:20">13:20</span> **Jonghyun Park** Moving on, I took a look at the government's evaluation criteria. I examined why the model ranked first on the AAII, the benchmark score most widely referenced worldwide, was nevertheless eliminated. I looked into it, and benchmark scores accounted for 40 points overall, with the AAII accounting for 25 of those points, while the remainder came from their own benchmark. As for this benchmark, if the benchmark questions become known, they can simply be trained on, so to prevent that and avoid leakage, they reportedly maintained a private benchmark. That's why they did not publicly disclose detailed scores for every category. From what I saw, they only disclosed things like approximate average scores and gaps, and which team ranked first. In the case of the AAII benchmark, as was publicly available to us, Motif ranked first in the Artificial Analysis score, while on their own benchmark, the SK Telecom model reportedly ranked first.
+
+<span class="paragraph-timestamp" data-ts="14:29">14:29</span> I think that was surprising. When evaluating frontier models, the intelligence we perceive in practice and benchmark scores tend to align fairly closely on the AAII, but the scores weren't just slightly different; there was a gap equivalent to almost one or two generations, yet on the other benchmark, a model that had ranked near the bottom came in first. I found that rather puzzling.
+
+<span class="paragraph-timestamp" data-ts="14:54">14:54</span> So I wondered what their benchmark looked like. I imagine that once the evaluation is completely over, they might make it public, but the data distribution is probably extremely different. The actual criteria being evaluated are probably very different as well.
+
+
+## An Ecosystem-Centered Evaluation Intent Beyond Model Performance    *15:06*
+
+<span class="paragraph-timestamp" data-ts="15:06">15:06</span> **Chester Roh** Since these are Korean independent foundation models, wouldn't there be a lot of datasets or benchmarks related to Korea?
+
+<span class="paragraph-timestamp" data-ts="15:13">15:13</span> **Jonghyun Park** I think so. They might ask about Korean cultural knowledge, and probably include many things like that, so it seems the models were trained extensively on those things. I imagine they likely possess a great deal of localized knowledge related to Korea, and then experts personally conducted qualitative evaluations, where the LG model reportedly ranked first. The average scores did not differ by very much.
+
+<span class="paragraph-timestamp" data-ts="15:42">15:42</span> Overall assessments were also released, and in the case of the Upstage model, it was integrated with the Daum portal and developed in collaboration with the FuriosaAI NPU. Details like these were mentioned, and looking at them, it seems they weren't evaluating only the model's token-level performance, but the ecosystem itself as well. How effectively it has been deployed at the application layer and made accessible to users, and then, at the infrastructure level, although we typically use NVIDIA GPUs for most things, not only those, but also other NPUs, particularly Korean hardware, through collaboration to ensure that it can run well, so that when a good model is developed in the future, how much it can contribute to the ecosystem, I think they were trying to assess things like that. SK Telecom and LG AI Research both actually deployed their models in commercial services, and had plans to collaborate with international organizations, so there were many assessments of things like that, and that hallucinations would be very rare, I think those were the kinds of assessments they received.
+
+<span class="paragraph-timestamp" data-ts="16:50">16:50</span> Then, in the case of Motif, only the assessment of the model itself was included in the summary, and my impression is that only Motif had the model itself covered in the assessment. For the others, assessments of aspects beyond the model seem to have been included, so regarding these evaluation criteria, people seem to be asking: We're building a foundation model, a good foundation model, so is it right to assess not the foundation model itself, but where it has been used? I think people are raising questions like that.
+
+<span class="paragraph-timestamp" data-ts="17:26">17:26</span> **Chester Roh** But the first objective of the Dokpamo project itself was not just the model, but also whether it could help elevate Korea's frontier-model ecosystem as a whole, and that was one of the evaluation criteria. So even when the teams were initially selected, how each consortium had been formed was a very important factor. Therefore, I think it would be fair to say that this was not evaluated solely on model performance.
+
+<span class="paragraph-timestamp" data-ts="17:53">17:53</span> Also, because government-led projects must prioritize fairness, it is very difficult for someone to manipulate something based on a particular bias. And within the evaluation rubric itself, AAII was worth 35 points, while the other factors also carried substantial weight, so I think we should bear in mind that the evaluation was not based solely on model performance.
+
+<span class="paragraph-timestamp" data-ts="18:17">18:17</span> Those things involve many political considerations, but it is fair to see even those as part of the game, so it makes sense that the expert evaluations highlighted these advantages and awarded them high scores for those aspects. We should respect that, and I don't think we can simply say, "What does that have to do with model performance?" Not given the nature of this project.
+
+<span class="paragraph-timestamp" data-ts="18:42">18:42</span> **Jonghyun Park** Right, right. Personally, I had understood that making a good model was naturally the highest priority, but as Chester Roh said, ensuring strong integration across the entire stack because this is a government project, and building a robust ecosystem, can certainly be seen as the most important factor.
+
+<span class="paragraph-timestamp" data-ts="19:00">19:00</span> **Chester Roh** That's why a consortium like Upstage's includes a great many companies, and SKT and LG also maintain strong consortia. But since Motif is a latecomer and a startup, it may have been disadvantaged in that area—essentially in its policy score. I do wonder whether it was at a slight disadvantage in that regard.
+
+<span class="paragraph-timestamp" data-ts="19:22">19:22</span> **Jonghyun Park** I think it may have been at a disadvantage.
+
+<span class="paragraph-timestamp" data-ts="19:25">19:25</span> **Chester Roh** Yes.
+
+<span class="paragraph-timestamp" data-ts="19:25">19:25</span> **Jonghyun Park** In particular, when we refer to a team, should we call it the lead team? We referred to the company building the model as the team, but looking at the actual teams, service companies and infrastructure companies across the stack formed teams together, so I remember each team having a huge number of companies. Those things were one of the main evaluation criteria. They also recruited users to try the models themselves and incorporated the resulting evaluation scores. One thing I found particularly striking was that they recruited evaluators from the general public and asked them to score the models, using demographic data to gather as diverse a group of people as possible. When a project like this is conducted, it could attract only people like us, people who are extremely interested in AI, but instead, they really made every effort to recruit people of all ages and genders, and I think things like this truly reflect the nature of a government project. For the public good, so that the benefits could reach as diverse a range of people as possible, I think that was how they recruited the evaluators. In any case, I heard that this resulted in a slight gap in the general-public evaluation scores. According to the announcement, they reportedly stated that the general-public evaluation scores did not affect which teams passed or failed.
+
+
+## The Public Evaluation Panel and the Korean-English Code-Switching 'Pangyo-eo' Controversy    *19:43*
+
+<span class="paragraph-timestamp" data-ts="20:45">20:45</span> **Jonghyun Park** So I was curious as well, and tried it myself. I wanted to see what the model itself was like. And according to the rumors, people mentioned this frequently in the chat during our livestreams as well: the Motif model scores very highly, but the scores we're looking at are not based on criteria specific to Korea. They assess mathematics or general knowledge through MMLU, and nearly all of the evaluations are conducted in English, but I heard that there was an issue with a lot of English getting mixed into its responses. That could be viewed as a problem, or it could be seen as irrelevant, but from the perspective of the Korean public, being able to converse well in Korean would presumably have been one of the important evaluation criteria, so the inclusion of English itself could be a problem. For AI to be readily accessible to everyone, that aspect could be somewhat disappointing, and I heard that point raised frequently.
+
+<span class="paragraph-timestamp" data-ts="21:40">21:40</span> So people were mentioning that in the comments too, calling it “Pangyo-speak.” It’s when Korean and English get mixed together.
+
+<span class="paragraph-timestamp" data-ts="21:48">21:48</span> **Chester Roh** We do that a lot too. Pangyo-speak.
+
+
+## Real-World Testing of the Dokpamo Models from an Agent Workflow Perspective    *21:50*
+
+<span class="paragraph-timestamp" data-ts="21:50">21:50</span> **Seungjoon Choi** I’m curious whether there were any models worth using for an agent workflow.
+
+<span class="paragraph-timestamp" data-ts="21:56">21:56</span> **Jonghyun Park** First, to explain how I tried using them, all of those models are available as open weight. But because the models are 300B, 700B, and so on, to run them myself and try them through an API, since I don’t have GPUs powerful enough, I would have to rent them, deploy the models, and use them by serving them, and that would be quite expensive. So I didn’t try that. We tried them through whatever access points were available,
+
+<span class="paragraph-timestamp" data-ts="22:21">22:21</span> and as a result, in Motif’s case, there is a Motif chat service. So I went to the chat service and tried it. I wasn’t using the model itself; I used it with the harness attached. So you could say I tried it with the entire agentic workflow built in.
+
+<span class="paragraph-timestamp" data-ts="22:38">22:38</span> In the case of Upstage Solar as well, when I went to the Solar service, the open model was not being served, and only the commercial model Solar Pro 4 was available. So I tried the chat service with that. I wasn’t able to try the open model.
+
+<span class="paragraph-timestamp" data-ts="22:54">22:54</span> In LG’s case, K-EXAONE had a demo chat service, but the site had been shut down, so I couldn’t try it. A serving provider called FriendliAI was serving it through an API, so I tried it through the API, and I was able to connect all the tools directly to this API and try them. So I connected tools for things like web browsing, and even writing and running Python, and tried it in an agentic way, at least on a lightweight basis.
+
+<span class="paragraph-timestamp" data-ts="23:21">23:21</span> There was no service where I could try A.X K2, so I wasn’t able to try it.
+
+<span class="paragraph-timestamp" data-ts="23:25">23:25</span> **Seungjoon Choi** So I haven’t tried this either, but for this to be used meaningfully, when we work on systems such as government networks, the networks are isolated, and because there is sensitive data, there are probably tasks that must be done exclusively with domestic models. When doing those kinds of tasks, I imagine that using agents will be important, so whether these models can call tools or run a sub-agent, and how closely they can replicate the workflows currently available will matter in practical use. Of course, as you mentioned earlier, there is also the aspect of enhancing our own capabilities and the capabilities of the ecosystem, but I think how these models can be served and used in today’s ways will also be something to watch.
+
+<span class="paragraph-timestamp" data-ts="24:10">24:10</span> **Chester Roh** And the environment used for the evaluation was probably designed to evaluate the model itself, so the model in its most minimal state, evaluated without a harness, was probably judged under harsh conditions. As for the model’s quality, its cognitive quality can be substantially improved by adding a harness, so I’ve heard that the quality of the model itself can be assessed somewhat differently from using it through the chat interface of an externally developed service.
+
+<span class="paragraph-timestamp" data-ts="24:47">24:47</span> **Jonghyun Park** I experienced that very clearly in the case of Motif. I’d heard reports that it produced a lot of mixed-in English, but I think those were probably comments from people who served and used the model directly. But when I used its own chat service, there was no such problem at all. The harness probably handled those things well, translating any English before returning the output, or perhaps selecting tokens so that only Korean tokens were generated. I suspect it must have been doing something along those lines. So I went through all these tests. I tried to test as many different things as possible, and during the livestream, I tried everything suggested in the comments. After that, I evaluated them, and the differences between the models were not as visually apparent as I had expected.
+
+
+## Live Hands-On Results and Motif vs. Solar Comparison    *25:17*
+
+<span class="paragraph-timestamp" data-ts="25:33">25:33</span> **Jonghyun Park** In one test, I asked them to recommend menu options, and asked what kind of place would be good for a blind date. Since I live near Pangyo, I asked whether they could properly find and tell me about actual restaurants in this area, and whether their answers were practical. Solar Pro 4 did an excellent job. I think it was very good at things like web search, based on watching the entire trajectory.
+
+<span class="paragraph-timestamp" data-ts="26:00">26:00</span> Next, someone asked me to do the gas stove benchmark, so I tried it. I asked a nonsensical question. People often do things like the car wash benchmark these days.
+
+<span class="paragraph-timestamp" data-ts="26:09">26:09</span> **Chester Roh** Yes.
+
+<span class="paragraph-timestamp" data-ts="26:10">26:10</span> **Jonghyun Park** When I tried something like that, only Motif gave the correct answer. I also did a hallucination test to see whether the models had good metacognition, and whether, when asked an absurdly difficult question, they would simply spout something plausible. Motif was also overwhelmingly the best at this. Then I also tried math problems, including problems from this year’s IMO, but they did much worse than I expected.
+
+<span class="paragraph-timestamp" data-ts="26:34">26:34</span> And I had them code a game, but when I tried this, none of them did particularly well either. What I realized while doing this was that Sonnet did it extremely well when I asked it. There was a significant difference in the quality of the results. So I assumed, of course, that they would be able to do it. Because we use frontier models so much, someone described us as being steeped in frontier models. We're so steeped in them that when we use even a slightly less capable model and something doesn't work, the perceived drop-off feels enormous.
+
+<span class="paragraph-timestamp" data-ts="27:14">27:14</span> Anyway, they didn't do very well. None of the models did. But among them, I think Solar did much better, and then I tried something that even frontier models struggle with: I asked them to write an entertaining novel, and of course, they all did a terrible job. None of them were entertaining, and above all, I ranked Motif first, although they were all mediocre, because there were still significant differences in quality among them. The other models produced things that made no sense at all. Someone said this in the comments. They said the writing looked like it had been written by someone with schizophrenia. The structure was completely incoherent, and it seemed like they were just spitting out tokens at random. A lot of the writing wasn't just uninteresting but was actually difficult to read at all. I think Motif handled these aspects well.
+
+<span class="paragraph-timestamp" data-ts="27:59">27:59</span> **Seungjoon Choi** Is this supposed to be a humorous martial arts story?
+
+<span class="paragraph-timestamp" data-ts="28:03">28:03</span> **Jonghyun Park** Yes, that's what I asked it to do. I asked it to write a martial arts novel in an entertaining way that could generate buzz through word of mouth. I deliberately wanted to try something that current models can't do, so I had them try this as well. Since I only spent about two hours evaluating the results, the variables weren't rigorously controlled, but I felt that, in many respects, Motif was genuinely intelligent. Even when it couldn't do something well, it was good at admitting what it didn't know, and when asked a strange question, it recognized that something was wrong with the question itself. Even when writing, it at least kept things coherent. It didn't feel like it intuitively knew exactly what to do and handled it perfectly. But it really is intelligent, and that was the impression I got.
+
+<span class="paragraph-timestamp" data-ts="28:52">28:52</span> But if you ask whether it performs well when given actual work, it did not. I felt Solar was much better at that, and there are two possible explanations. In Upstage's case, they had already built a harness around Solar, deployed it, and were successfully operating a chat service, so the harness may have been well refined. Or they may have done SFT fine-tuning after pre-training to make it polished and user-friendly, or refined the post-training to make it satisfying for users. In any case, perhaps it performed tasks well because the backend had been done well. This also changed my view
+
+
+## Criteria for a Good Foundation Model Beyond Benchmarks    *29:32*
+
+<span class="paragraph-timestamp" data-ts="29:33">29:33</span> **Jonghyun Park** of benchmarks somewhat. Benchmarks are continually updated, with new benchmarks emerging, so it is said to be difficult to maximize scores by tailoring models to them, but I found that high benchmark scores align with actual intelligence more closely than I had expected. So I came away thinking that looking at benchmarks isn't a bad way to gauge perceived performance. Another thought I had was that these are foundation models being built. Dokpamo was intended from the outset to develop independent foundation models, and when considering how to assess the value of these foundation models, is a model that performs tasks well right now necessarily a good model? Or, since it is in a pre-trained state, if others take a model with greater scale and intelligence and use it, and the goal is to expand the ecosystem, they will all tune it for their own purposes. Once tuned, I think Motif 3 would probably be the best. That's just my estimate.
+
+<span class="paragraph-timestamp" data-ts="30:35">30:35</span> That made me wonder whether it might be the better foundation model after all. People say it frequently mixes Korean and English, but I feel that this is something that can readily be fixed later through fine-tuning. So it made me wonder what constitutes a good model in this ecosystem.
+
+<span class="paragraph-timestamp" data-ts="30:55">30:55</span> **Chester Roh** Still, Motif did very well. The very fact that they could build a model of this quality in such a short period of time, and that they could accomplish this much with an elite team of around 30 people, makes me want to give them a very high score. They certainly accomplished something remarkable, but Dokpamo also had the evaluation criteria and rubrics mentioned earlier, and those include more than just the criteria for evaluating the model. This is all subjective.
+
+
+## Motif's Narrow Defeat and the Gap Between Public Rubrics and Industry Perspectives    *31:11*
+
+<span class="paragraph-timestamp" data-ts="31:26">31:26</span> **Chester Roh** When it comes to how the model's quality is perceived, we probably asked many of those questions because we have been influenced by being steeped in frontier models, but ordinary people may have asked entirely different things. Since we don't know that distribution, I think it would be difficult to evaluate. Evaluation itself is a system designed to extract objectivity from subjectivity, so that's done to ensure fairness and consider various aspects.
+
+<span class="paragraph-timestamp" data-ts="31:58">31:58</span> Since we're people in the private sector, we call the government side the public sector. When the public sector does its work, there are so many cases where its rubrics are difficult to understand. But we focus on solving problems, and if the private-sector standard is to obsess over a single decisive aspect of quality, when we participate in events held by the public sector and talk with senior officials, what matters to them isn't that, but how to get as many people as possible to reach a compromise, and what approach will maximize everyone's overall satisfaction. They were doing things grounded very deeply in democracy. In that process, anything that stands out gets cut down. And because of that standout quality, we would give it a high score, but those qualities get lumped together into the overall statistics, and ultimately fall behind in the final results. Since we've seen many cases like this, from Motif's perspective, this was a very unfortunate narrow loss. And for those who support Motif, it is disappointing, but an evaluation is an evaluation, so the remaining three companies will move forward.
+
+<span class="paragraph-timestamp" data-ts="33:14">33:14</span> **Jonghyun Park** Regarding the public sector as well, in a sense, people like us— and probably many people listening to this— seem to focus on the upper end. How can we use this to gain more leverage, make good use of it, and draw out as much intelligence as possible? But from the public sector's perspective, I get the sense that it focuses on the lower end. To put it as simply as possible, it wants all citizens to benefit as much as possible and raise the overall standard. So in that respect, I think our perspectives were very different. Thinking about it, from the public sector's perspective, fairness is extremely important, and I think that's absolutely right. We simply have different positions, but when ranked by open weight, it's in fifth place. Even globally, it's the fifth-ranked model among open weight models. So although it won't receive government support through this project, even apart from the Dokpamo project, the model has performed exceptionally well globally, so naturally, there are probably many parties around the world interested in it and wanting to invest, and there are likely many businesses in Korea as well that want to use it to do something together, so I'm excited about what lies ahead.
+
+
+## The Purpose of Sovereign AI and the Scope of an 'Independent' Model    *34:31*
+
+<span class="paragraph-timestamp" data-ts="34:30">34:30</span> **Jonghyun Park** Yes. So I'm curious about these things too. And I'm curious about Chester and Seungjoon's thoughts, and especially the thoughts of everyone watching this video. In any case, we're building an ecosystem around sovereign AI— a government AI of our own over which Korea has sovereignty— and it seems that Korea is pushing this more aggressively than almost any other country. Compared with other countries, that is. So I'm curious about why we're doing this, what the objective is, and what we would need to accomplish for it to be considered a success. I'm curious about all these things. Because I had only thought about it in terms of producing a good model and using it to avoid falling behind at the frontier, from that perspective alone. Even during the evaluation, people in the chat asked many questions like these. What exactly is Dokpamo supposed to evaluate? What makes a model good? So regarding that, ultimately, it needs to be integrated somewhere and make a tangible contribution to citizens and industry. As was mentioned earlier in the expert evaluation, if I focused on how intelligent the model is, other considerations might include whether it's actually used in a portal service, or whether it can truly work well in a service used by the entire population. I think there are considerations like these.
+
+<span class="paragraph-timestamp" data-ts="35:48">35:48</span> Next, when we say “independent,” just how far must that independence extend for us to pursue the theme of sovereignty and actually have sovereignty? Is it enough to possess the model weight? Or do we need to create the data as well? Or must we extend this all the way to infrastructure and break our dependence on NVIDIA GPU? And then, how much should we invest?
+
+<span class="paragraph-timestamp" data-ts="36:14">36:14</span> Also, compared with when I first heard about this Dokpamo project, my thinking has changed considerably. I used to be somewhat skeptical. Because I didn't think we could do it. Can this really be considered something we've done independently? Is it enough for the government to take the initiative and put tax money into it? I had negative views about questions like these, but my thinking has changed considerably now. Because even as we watch good models emerge from China, we realize something. This really is possible. There's no reason we can't do it either, I thought, and creating a good model actually wasn't an enormously deep moat. So as to whether we can do it too, my thinking has also become considerably more positive, What do we need to do to get better? These are the things I'm curious about.
+
+<span class="paragraph-timestamp" data-ts="37:06">37:06</span> Right now, they've formed these elite teams and are eliminating them one by one, concentrating resources on fewer teams in this kind of structure, and for an approach taken by the public sector, it feels quite similar to how the private sector does things. I mean, having them compete like this. So personally, I think this is being run quite well. In any case, I'm curious to hear everyone's candid opinions on this.
+
+
+## The Commoditization of AI and Why the State Invests in Dokpamo    *37:37*
+
+<span class="paragraph-timestamp" data-ts="37:37">37:37</span> **Chester Roh** I don't think there is any policy that satisfies everyone. Because setting criteria like these is difficult, we have the system we call society, divided into systems such as the government, the National Assembly, and the judiciary, with responsibilities distributed among them. Lately, I've also kept talking about the control plane and often said that it has led me to reconsider why companies and society are in the state they're in, but returning to the Dokpamo discussion, even when Dokpamo was first launched, people said we could simply use the American frontier models, and that they would have no reason to block us, so as I understand it, there was also debate over why we should go out of our way to make this investment. But over the course of nearly a year, both the external environment and our perspective on the frontier model industry have completely changed, haven't they? It seems that the recipe isn't as extraordinary as we thought. Once you get beyond a certain baseline, it seems you can put in compute and high-quality data, run it, and get a model. Once that threshold is crossed, it becomes something anyone can do, and that's one thing we've realized from watching the frontier labs in the United States and the frontier labs in China.
+
+<span class="paragraph-timestamp" data-ts="38:54">38:54</span> One thing that has changed as a result is that the seemingly permanent advantage of Anthropic's or OpenAI's models has now reached a point where even they have to worry about it, so there are now a great many model providers, and instead of being a monopoly good controlled by a select few, it is becoming what we call a commodity. When something becomes a common consumer product, a commodity, the amount of wealth that a select few could retain decreases, but the wealth of the general public and society as a whole increases dramatically. That's because it keeps getting cheaper and anyone can make it. The continual transformation of monopoly goods into commodities is the history of evolution, the history of industrialization, and in a sense, the history of everything. But because this technology is advancing rapidly, drawing enormous interest, and having a major impact, I think its growth has been incredibly compressed. Should we think of it as something like nuclear weapons? If we don't build it, our existence is threatened; our system is threatened. For reasons like these, countries seem to have viewed it at almost that level and entered the race. Otherwise, China wouldn't have pursued it at the national level either. But China went all in on it too. And for Korea to follow the United States and China, moving even faster than Europe through an intensive commitment of resources, is itself meaningful, in my view.
+
+<span class="paragraph-timestamp" data-ts="40:23">40:23</span> The reason I supported the Dokpamo project at the time was that, after all, we were a country with a shortage of GPUs. If GPUs became more plentiful and, regardless of which companies used them, we developed a pool of engineers with that experience, once that expertise emerges somewhere, it spreads elsewhere immediately. I think that clearly has an impact on the frontier labs in the United States as well, because many of their engineers are Chinese Americans. And in one way or another, their academic and regional ties connect them closely with people in mainland China. Even from my limited experience visiting Silicon Valley, meeting engineers, and talking with them about various things, remarks that provide crucial hints are exchanged this freely, so I don't think there's any way recipes aren't also exchanged at the highest levels. Those exchanged recipes then made their way to China, and from there, they came to Korea. For the same reason, engineers who participated in the Dokpamo project could leave and start their own companies, which would allow this expertise to spread more widely throughout society. From that broader perspective, I believe this project absolutely requires strong public investment, and as for issues within it such as equity and fairness, just as we see in presidential or National Assembly elections, some people will be satisfied while others will be disappointed; such outcomes are simply unavoidable. But when viewed from the perspective of the wealth of society as a whole, this is an industry the government needs to support.
+
+<span class="paragraph-timestamp" data-ts="42:03">42:03</span> That's because Korea's private sector isn't large enough to pursue this on its own. At the time, Samsung Electronics and SK hynix were not as financially comfortable as they are now. The sudden increase in the wealth of Samsung Electronics and SK hynix happened over the span of exactly one year. Now, if SK hynix or Samsung Electronics decided to use its own resources to build this kind of sovereign model, it could probably do it. Then, when they decide they want to do it, if there are plenty of people with this kind of talent in Korea, there will only be more of them. Ultimately, that's one of Korea's strengths: whenever an industry emerges, competition becomes incredibly fierce. And there are a lot of smart people. So people say, “The problem with Korea is that even when someone creates something this good, others copy it without any pride whatsoever.” But conversely, from the public's perspective, all of that works to their benefit. Products rapidly become cheaper. So that's the perspective we should take.
+
+<span class="paragraph-timestamp" data-ts="42:57">42:57</span> Right now, we are also talking about the frontier—we have been saying a great deal about the word frontier— with the US and China leading the way, and while we're working with models in the hundreds of billions, we could probably try 1T or 2T as well, which essentially means reaching the Opus level. Once you get to 1 trillion or 2 trillion, if we can just reach the Opus level, not everyone can afford a Porsche 911, and the frontier by then may have already reached 10 trillion or 20 trillion, but just as making the Avante affordable increased public welfare, Avante-like models that anyone can use would become available to everyone, so perhaps that's the kind of thing we should be looking forward to.
+
+<span class="paragraph-timestamp" data-ts="43:42">43:42</span> So honestly, I want to thank every engineer who participated in the Dokpamo initiative and everyone who took part in those consortiums. They worked hard. And whether they competed or whatever else happened, this will remain a major experience and asset for Korean society as a whole, an experience of having crossed a certain critical threshold. If those people go on to join startups, move to other organizations, or give lectures somewhere like Fast Campus, then the Korean-speaking cultural sphere could develop even greater competitiveness. I also think the Korean-speaking cultural sphere is tremendously important. That's because not everyone can naturally consume English-language content, and the language barrier still exists. If more smart people in Korea work on this, we could create things here and export them in the other direction.
+
+
+## Model Release Pace and the Challenge of a Sustainable Ecosystem    *44:36*
+
+<span class="paragraph-timestamp" data-ts="44:36">44:36</span> **Seungjoon Choi** By today's standards, the models coming out of Dokpamo need to be released not only during the limited competition period, but, given the current landscape, at intervals of one or two months. Doesn't that mean we need to pour that much more into it? Because this isn't something you release once and then you're done. You need to keep releasing models. So I was hoping they could reach a point where they can keep pace with that cadence. That applies both to the models and to the harness, because they need to move forward together. I did feel that selecting exactly three organizations absolutely should not be the end of it.
+
+<span class="paragraph-timestamp" data-ts="45:12">45:12</span> **Chester Roh** That's right. Also, among the other three organizations, Upstage has already become quite a substantial mid-sized venture company, while SKT and LG are affiliated with conglomerates, and conversely, Motif has received a large amount of funding directly from a global fund, so commercially, it may achieve even greater success. Over just the past few months, haven't we constantly watched fortunes turn and turn again, as the saying goes? Just when Anthropic seems finished, Codex rises, and just when it seems Codex and Anthropic are finished, Kimi and DeepSeek rise, and just when it seems Kimi and DeepSeek are finished, new models keep emerging from China as well. Isn't this the cycle of a healthy ecosystem?
+
+<span class="paragraph-timestamp" data-ts="45:56">45:56</span> **Seungjoon Choi** To be part of that, to put it bluntly, you have to be just as obsessed. The rhythm and the sheer amount of investment…
+
+<span class="paragraph-timestamp" data-ts="46:04">46:04</span> **Chester Roh** Right. This ultimately comes back to money again, and I hope they can receive more funding so they can release models every month.
+
+<span class="paragraph-timestamp" data-ts="46:11">46:11</span> **Jonghyun Park** Listening to this, I also feel that my view of this initiative itself has shifted considerably in a positive direction. Motif is the clearest proof of that. Because an initiative like this existed, a model like that could emerge, and a team like that could emerge. In fact, there is probably a high likelihood that it will continue to grow going forward. And then, as Seungjoon said, it doesn't really feel like models are currently being churned out that quickly. Compared with overseas, it feels as though they're barely managing to release one for each evaluation period. But conversely, outside the US and China, in other places—for example, even in the case of Mistral— models aren't being churned out that quickly either. There also seems to be a lot of talk that Mistral is practically trying to change its business model into that of a GPU provider. That rumor seems to be circulating quite a bit. Still, it does feel like we're at least barely managing to keep up in this way. So I hope we can rise high enough to compete on the same trajectory. Since this is a mechanism for accelerating that, I think creating the ecosystem itself is a good thing.
+
+<span class="paragraph-timestamp" data-ts="47:16">47:16</span> I've been talking about this too, but there was one decisive reason I decided to go live. I was having lunch, and everyone at the next table was talking about that. So I thought, ‘I should go live tonight and try it myself.’ That's what I thought.
+
+<span class="paragraph-timestamp" data-ts="47:32">47:32</span> **Chester Roh** Were they people from Pangyo? Or were they just ordinary people?
+
+<span class="paragraph-timestamp" data-ts="47:36">47:36</span> **Jonghyun Park** Judging by their appearance, they did seem to be people from Pangyo.
+
+<span class="paragraph-timestamp" data-ts="47:39">47:39</span> **Chester Roh** Yes, right.
+
+<span class="paragraph-timestamp" data-ts="47:40">47:40</span> **Jonghyun Park** But I don't know what field they worked in, Anyway, the area where I'm active is kind of like that, so there's nationwide interest. We're talking about it, and those watching this will learn more about it through this, and I said that I was curious about your opinions, so many people will probably exchange a lot of opinions in the comments, and even if people think differently, discussions will arise, and the very act of taking an interest in things like this seems to be moving us toward a society that creates people nationwide who use AI well, which I think is great, and I hope it gets even more attention.
+
+<span class="paragraph-timestamp" data-ts="48:20">48:20</span> **Seungjoon Choi** Apparently, there's a phrase called “camera massage.” It seems to imply that celebrities improve the more often they're shown on camera, and perhaps this will also improve as more people nationwide take an interest.
+
+
+## The Double-Edged Sword of Government Projects and Real Market Competition    *48:31*
+
+<span class="paragraph-timestamp" data-ts="48:31">48:31</span> **Chester Roh** And government projects are always a double-edged sword. So, let's say you came in first in Dokpamo. What do you gain? You were provided with GPU resources during that period. Those are worth tens or even hundreds of millions of dollars. Of course, that's a substantial resource, but once that ends, you have to venture into an extremely harsh market, and in that market, I don't think people will use a Korean model just because they're Korean. You have to compete with the global frontier, For example, suppose I'm a company, and I say, “We can't use an OpenAI model. Then which model should we use as the base to build the on-prem model for our coding harness?” Then, of course, among the open-weight models, wouldn't you choose the frontier of the frontier? In that sense, it's a completely open competitive environment, so from Motif's perspective, conversely, getting out of this complicated rubric game and being free to fly may actually help Motif make a name for itself, and then, with the industry currently seeing strong demand for on-prem, open-weight models, it also gives Motif more time to push further in that direction.
+
+<span class="paragraph-timestamp" data-ts="49:43">49:43</span> **Seungjoon Choi** If you think about competitions, the winner isn't necessarily the one who becomes successful. Take singing competitions, for example.
+
+<span class="paragraph-timestamp" data-ts="49:49">49:49</span> **Jonghyun Park** Right.
+
+<span class="paragraph-timestamp" data-ts="49:50">49:50</span> **Chester Roh** Things come full circle, and as we keep saying, this industry shifts from an upswing to a downswing every two weeks, and from a downswing to an upswing, so it keeps changing constantly, and given the speed of the market, rather than running ourselves ragged here, simply getting into the market quickly isn't a bad idea either.
+
+<span class="paragraph-timestamp" data-ts="50:08">50:08</span> **Jonghyun Park** Yes, shall we wrap this up here and move on?
+
+<span class="paragraph-timestamp" data-ts="50:11">50:11</span> **Chester Roh** Yes, let's move on at this point. This is also because Jonghyun has a bit of a soft spot for Motif, but still, personally, I think this has worked out much better for Motif.
+
+<span class="paragraph-timestamp" data-ts="50:22">50:22</span> **Seungjoon Choi** Then I'll quickly continue.
+
+<span class="paragraph-timestamp" data-ts="50:27">50:27</span> **Chester Roh** Jonghyun, have you ever worked on a government project? Writing proposals and such?
+
+<span class="paragraph-timestamp" data-ts="50:31">50:31</span> **Jonghyun Park** I did that a lot as a graduate student. I wrote a tremendous number of proposals. I worked on a lot of government-funded projects.
+
+
+## Frontier News on the Astra Training Pause, the Anthropic Debate, and Cancer Research    *50:36*
+
+<span class="paragraph-timestamp" data-ts="50:36">50:36</span> **Chester Roh** Yes.
+
+<span class="paragraph-timestamp" data-ts="50:36">50:36</span> **Seungjoon Choi** So, Dokpamo also had its dopamine-inducing moments this week, and aren't we chasing dopamine when it comes to AI? So I'd like to look back at news like that and also talk about some of my personal experiences. Chester mentioned earlier what Sam Altman said, that they were stopping for two weeks. But these days, CEOs who generate hype make strategic statements. So, of course, you start to suspect that this is marketing, but he clarified in a comment that stopping for two weeks didn't mean stopping Astra, but stopping work on the model after that. So it looks like Astra will be released as scheduled, and I don't know whether that will be in late August or early September, or exactly when, but something like Astra should be coming soon, though I don't know whether it will be called GPT-6. It seems likely to be released. But what they're saying they'll stop now is that they'll stop completely for just two weeks. So I don't really understand what kind of play this is.
+
+<span class="paragraph-timestamp" data-ts="51:37">51:37</span> **Chester Roh** There was a marketing case
+
+<span class="paragraph-timestamp" data-ts="51:38">51:38</span> **Seungjoon Choi** like that, right?
+
+<span class="paragraph-timestamp" data-ts="51:39">51:39</span> **Chester Roh** It's probably marketing. Anthropic took a break, so we're taking one too.
+
+<span class="paragraph-timestamp" data-ts="51:43">51:43</span> **Seungjoon Choi** And another thing that became an issue was that Dario Amodei posted a lengthy tweet, and it went somewhat viral. But this started with the All-In Podcast. Gavin said something that criticized some of the things Dario or Anthropic had said, and Sholto Douglas brought it back up and posted it on Twitter, and as it turned into a debate between Gavin and Sholto, Dario wrote a lengthy account of his thoughts, which then spread all over the place again, but what I found interesting and worth watching was that cancer came up here. That was the point I was watching closely. Dario talked about curing cancer. In connection with that, there was this. Anthropic has been working on protein design continuously. There was also talk of Moderna using this in an mRNA vaccine to slow the progression of cancer, which brought it to mind.
+
+
+## The Richard Sutton Interview and the Vision of Continual Learning    *52:43*
+
+<span class="paragraph-timestamp" data-ts="52:37">52:37</span> **Seungjoon Choi** So there were these things, and what caught my attention was Sequoia's interview with Sutton. When we saw Sutton in last year's Dwarkesh episode, Sutton gave us the strong impression that he wasn't very favorable toward LLMs. Then Sutton gave an interesting account of the work he and his team are doing.
+
+<span class="paragraph-timestamp" data-ts="52:59">52:59</span> **Chester Roh** Yes, Sutton used such lofty terminology that ordinary folks like us couldn't understand it.
+
+<span class="paragraph-timestamp" data-ts="53:06">53:06</span> **Seungjoon Choi** So this episode explains what Sutton said then in a little more concrete detail. Sutton actually founded OAK Lab as a very small startup, and discussed what he is trying to tackle there. Ultimately, Sutton envisions an agent that can learn and grow on its own in that vast world, and continue generating new ideas— instead of merely combining things within the distribution of what it has already learned, it can acquire new capabilities through its own experience. Sutton also presented this vision last year in the position paper “The Era of Experience,” and the theoretical ideas behind it are introduced in this episode.
+
+<span class="paragraph-timestamp" data-ts="53:49">53:49</span> So, after simply skipping over the first half, there is something called the Alberta Plan, which Sutton and others published in 2022 to set out in advance what they intended to pursue going forward. They were already talking about continual learning there. This time, though, Sutton gave some hints about how they would achieve it. Interestingly, when training a model, you have to give it a step size. How large to make something like the learning rate is an issue related to hyperparameter tuning, and having a learner for that itself—that is, making it a trainable parameter— has been a topic in meta-learning. Sutton said they would assign one to each per-parameter. So for the model—that is, the agent—to move forward, some things must preserve what it has learned to value without forgetting it, so their step sizes would be set close to zero, while things that need continual updating would be left more open, allowing learning to occur non-uniformly.
+
+<span class="paragraph-timestamp" data-ts="54:53">54:53</span> And as another component that makes this possible, Sutton introduced the concept of continual backpropagation. What that means is, as the model assesses its overall learning situation and determines what to retain and what to update on its own, if there is an underused parameter space, randomness would be injected into it. This would return it to its initial distribution and let it learn anew, implementing something akin to neuroplasticity— that was the plan discussed this time.
+
+<span class="paragraph-timestamp" data-ts="55:26">55:26</span> As for what this could enable, the plan for what they aim to pursue over a 5- to 10-year time frame is to build a model of around 1T parameters that uses continual learning to keep learning through experience. That is the goal they have set for themselves. That was quite fascinating.
+
+<span class="paragraph-timestamp" data-ts="55:53">55:53</span> **Jonghyun Park** To briefly summarize what has been said about Richard Sutton so far, both in the previous Dwarkesh episode and in this Sequoia appearance, Seungjoon neatly summarized Sutton as being opposed to LLMs. One of the problems Sutton points to is their inability to do continual learning. With an LLM, once you finish tuning the model, its weights become fixed, and it only performs inference in that state. We need to keep learning as we take actions, but the problem is that LLMs do not do that well. Humans learn this way— through experience— but since an LLM does not, it naturally has limitations. I think that was Sutton's argument. So to solve that problem, Sutton intends to research and introduce these techniques. That is the broad trajectory, right?
+
+<span class="paragraph-timestamp" data-ts="56:39">56:39</span> **Seungjoon Choi** And Sutton's ideas are rather radical. At the beginning, Sutton also explained why he tends to think in such radical ways. Interestingly, from Sutton's perspective, there isn't much difference between a human and a squirrel.
+
+<span class="paragraph-timestamp" data-ts="56:51">56:51</span> **Jonghyun Park** Yes, I think Sutton drew a lot of analogies with animals. He did last time as well.
+
+<span class="paragraph-timestamp" data-ts="56:55">56:55</span> **Seungjoon Choi** That's because squirrels also learn through the world, and they don't learn how to control their muscles by reading a book. So from that perspective, how one develops new capabilities on one's own seems to be the focus of Sutton's inquiry. And that is also the part that remains connected to AI. My main takeaway was that the concrete details he shared were fascinating in this episode.
+
+
+## Augmented Transcript Reading and Zoomable Interface Experiments    *57:22*
+
+<span class="paragraph-timestamp" data-ts="57:20">57:20</span> **Seungjoon Choi** Sutton talked a lot about abstraction in this episode. I can highlight things, and I've set it up so I can add notes here. So, after a long while, to introduce my prompt again, I first paste in the transcript, and then create HTML. And for me, having the speakers marked like this reduces my cognitive load and lets me enjoy reading things like emotional expressions, so I include a prompt that adds these kinds of markers. Then, when terms like these appear, instead of looking them up as I encounter them, I have them all researched in advance. So I set the whole task running at once.
+
+<span class="paragraph-timestamp" data-ts="58:02">58:02</span> Then there are some design-related terms here, and although the original only has the transcript, as you can see here, it includes diagrams. I have the diagrams generated as SVG, and first have it preview them multimodally, then repeat a loop of visually improving them. Then I also make it possible to save things to local storage, and by using notes and highlights, I augment it myself. So my view is that we should read the entire original, but read it expansively. Without summarizing it. Then I add things like notes, and when I export them, they can also be used as input elsewhere, which is something I've been trying a lot lately, but it all comes out vertically. So vertically, it gives you enough information to scroll straight through, but after trying that last week, I found it didn't stay in my head very well.
+
+<span class="paragraph-timestamp" data-ts="58:57">58:57</span> I took the things I introduced and arranged all of them vertically like this. So I created a zoomable interface. These are the things I introduced last week, such as things I saw on YouTube and articles I read. So I can look through them, and because I feel that some of the content is related, I made it possible to view them horizontally as well, handling both the vertical and horizontal dimensions, as a tool to assist my cognition. Because I have to take in so much information, it doesn't stay in my head, and I can't find it again either.
+
+<span class="paragraph-timestamp" data-ts="59:35">59:35</span> So I've made tools like these, but what I want to revisit today is the recursive self-improvement discussion, specifically what Dwarkesh asked and the related issues, while looking at the diagram.
+
+<span class="paragraph-timestamp" data-ts="59:51">59:51</span> **Jonghyun Park** Looking at how you've organized this, an LLM is simply a flow of tokens—in a sense, a model that handles one-dimensional information— whereas humans clearly grasp horizontal and vertical relationships at a glance, which is why you used a tool like that. Humans are creatures that process information visually. So the difference certainly feels apparent. It occurred to me that this might also be one of the differences Sutton is talking about.
+
+<span class="paragraph-timestamp" data-ts="60:19">60:19</span> **Seungjoon Choi** And the reason I insert diagrams like SVG here is so that information remains visible when I zoom out, allowing me to anchor to it quickly. There's also a concept called semantic zoom, which, depending on the level of detail, determines what remains visible when you zoom out. This isn't exactly that model, but there are similarities.
+
+<span class="paragraph-timestamp" data-ts="60:40">60:40</span> So what I've been continually digging into lately is something Oriol also mentioned midway through the Dwarkesh episode: when it comes to implementing things at a medium or small scale and experimenting with them, LLMs are exceptionally good. And because those things are inexpensive, they can repeatedly experiment and explore the space of possibilities very well. But the pre-training through which they actually acquire those capabilities can't be done frequently, so it isn't easy to run things in parallel like this and evaluate them. Therefore, as Dwarkesh pointed out, inevitably, running a run that can only be performed a few times creates a dependence on taste. And because LLMs still lack this kind of taste, they can't do it by themselves. Dwarkesh's suspicion was that this is where RSI breaks down.
+
+
+## The Limits of Hill Climbing and Agent Workflows That See the Big Picture    *61:15*
+
+<span class="paragraph-timestamp" data-ts="61:30">61:30</span> **Seungjoon Choi** But when I'm working, I feel something similar. These days, when conducting small-scale experiments, the workflow everyone uses is to quickly formulate multiple hypotheses, distribute the implementation of the hypothesis space among the individual agents and run them all, then orchestrate and merge the results. There are spaces where that works well, but there's a bigger picture you can't discover there, no matter how much you do. So this episode also uses the term hill climbing, and the models are good at hill climbing. When there are measurable metrics, and the task involves reducing those numbers incrementally, current models are exceptionally good at it. But inevitably, there are cases where they fall into a local minimum. Because they try to optimize within too narrow a space, they miss the bigger picture, and only when prompted to step back do they finally take a broader view and say that they missed it. But they can't do that by themselves, so I keep thinking about it, and I've been working on that.
+
+<span class="paragraph-timestamp" data-ts="62:29">62:29</span> But some of these issues are resolved as model capabilities improve. So when I introduced this back around March, I showed you that this didn't work. So when doing something like this, I wanted the polygon to flow beautifully here, and after talking about that, I built a modeler at the time, and used it to make something like a horn like this, but it didn't work with certain topologies. When I tried it a day or two after Sol came out, it certainly wasn't easy, but I did solve it. After about a day, of investing that much time. So to my eyes, it's very similar to the flow of quad meshes produced by commercial software. So I think we've reached the point where these things are actually usable. It was nice to realize that this could be done, and what I've chosen lately was to see what I could try in an area that interests me.
+
+<span class="paragraph-timestamp" data-ts="63:35">63:35</span> So design is still a non-verifiable domain, but even so, there are measurable metrics, and although they are not metrics that directly represent actual aesthetics, I think there are proxy metrics, in other words, substitute metrics, so the first thing I experimented with was typesetting. The key question is how to make non-verifiable problems approach something closer to verifiable problems. So,
+
+
+## Experimenting with Proxy Metrics to Make Typesetting Verifiable    *63:58*
+
+<span class="paragraph-timestamp" data-ts="64:12">64:12</span> **Jonghyun Park** For example, what kinds of proxy metrics are there? Even if it's just something that could assign an evaluation score to a design, I'd like to hear an example.
+
+<span class="paragraph-timestamp" data-ts="64:21">64:21</span> **Seungjoon Choi** Typesetting is somewhat easier. Typesetting has been studied extensively. So in typesetting, there's how the text should flow here, and if you look here, there's line spacing, and of course, things like changing the type size, or the font size, but even then, the right edge needs to flow beautifully. It shouldn't be too jagged; this part needs to flow well. That makes it both pleasant to look at and easy to read. But rather than reading it like this, using full justification makes it look more like what we see when reading a book.
+
+<span class="paragraph-timestamp" data-ts="65:01">65:01</span> And I'll make it a bit larger when viewing it in a single column. Things like the indentation here, or increasing the spacing between paragraphs, which shouldn't be too wide or too narrow, are all measurable. And TeX is where this has already been extensively studied. LaTeX actually has an algorithm called Knuth-Plass, which uses dynamic programming, that is, dynamic programming, to measure this and fit it within TeX. But what Knuth-Plass discovered in the 1980s was that when a figure containing an image is added here, it becomes an NP problem. It was already proven in the 1980s that this becomes a problem that cannot be solved in polynomial time. But these days, libraries that use the Knuth-Plass algorithm are becoming quite common. There's one called Justify, and there's also FreeText for typesetting, and many such tools are coming out, so I experimented with them too. When a professional designer does this, they tune it much more precisely, adjusting all these elements as they work. But at a glance, I tested whether it could still reach a reasonably acceptable level of readability, and thought, this actually works fairly well, which was the impression I got.
+
+
+## Parametric Hangul Font Generation and the Difficulty of Evaluating Design    *66:28*
+
+<span class="paragraph-timestamp" data-ts="66:28">66:28</span> **Seungjoon Choi** But when I moved on to fonts, there was much more freedom, and I've been trying to create compositional Hangul, to create a Hangul font, and simply converting this to Bézier is no problem at all. Parametric fonts were already a very popular genre over a decade ago. But what I'm attempting isn't to modify the spline curve, but to turn the formation process itself into a function. So, you can modify all of these as well, but there's also a method where you have a pen tip, and turn the movement of that pen tip into an outline, called METAFONT, which Knuth also created, and that's the approach I'm using. The fonts produced here this way aren't pretty at all. The Hangul characters are compositional, but they're not fonts you could actually use.
+
+<span class="paragraph-timestamp" data-ts="67:29">67:29</span> **Jonghyun Park** Here's what I'm curious about. You think the font you're showing us now isn't pretty because it generated the font on its own, and the next step is to somehow score whether the font is pretty or not, but because scoring it is so difficult, you're trying to find some way to derive proxy metrics that can be used to score it, right?
+
+<span class="paragraph-timestamp" data-ts="67:48">67:48</span> **Seungjoon Choi** That's right. So what I'm trying now is, if you look here, there are sections for the initial, medial, and final consonants, and I'm trying to pull those spaces in like this, but they're interdependent. Sometimes this needs to move downward, and if you actually write the syllable '쀍', This vowel’s flick shouldn’t be here, it should be around here. But doing that breaks other characters. People intuitively understand the correlations between those things, but we need to make them all measurable so that the model can work similarly to automatic differentiation— though it isn’t actually automatic differentiation— by projecting things around this area like this, and then assuming that among them, there is a reference font that serves as the actual target, such as Noto or Noto KR, and training it based on how closely it resembles that space, which is the approach I’m using now, but it still isn’t working very well. So the model is still continually forming hypotheses, experimenting, measuring, and adjusting, and I’m still working through that process, but to my eyes, there’s still a long way to go. Checking all the boxes and creating a genuinely usable font are two things on entirely different levels.
+
+<span class="paragraph-timestamp" data-ts="69:06">69:06</span> This is in the realm of design right now, but the same thing recurs when doing other kinds of work. You need to look at the big picture and quantify the metrics that matter to you within it, as well as the values that matter, to make them measurable. That way, the models can hill climb through the individual parts, then look at the whole again and provide feedback on how things are being handled and what isn’t keeping up. But even when you use reviewer models, they end up hill climbing. So as I work on this, I keep thinking that we still have quite a long way to go.
+
+<span class="paragraph-timestamp" data-ts="69:50">69:50</span> **Chester Roh** Aren’t you being far too harsh? Even getting this far could be considered a good job, couldn’t it?
+
+<span class="paragraph-timestamp" data-ts="69:56">69:56</span> **Seungjoon Choi** It’s doing an excellent job. The point is that implementing something at this level is incredibly inexpensive. Creating a parametric font, that is. This one is a bit difficult because it’s Korean,
+
+<span class="paragraph-timestamp" data-ts="70:07">70:07</span> **Chester Roh** In the past, something like this would have required a whole team at a font company to go back and forth for quite a long time to carry out the project, but Seungjoon is directing it alone and pushing it forward with models involved. but once it’s all finished, what is it meant to be used for?
+
+<span class="paragraph-timestamp" data-ts="70:24">70:24</span> **Seungjoon Choi** I’m just going to use it in my everyday work. There are times when I need to do design work at the kindergarten, and it’s difficult.
+
+<span class="paragraph-timestamp" data-ts="70:29">70:29</span> **Chester Roh** So when the kindergarten sends out documents or does something else, the goal is to publish it using a distinctive font of your own, right?
+
+<span class="paragraph-timestamp" data-ts="70:39">70:39</span> **Seungjoon Choi** When you work, you always end up using the same fonts, and some aspects of those fonts aren’t quite suitable, so I thought it would be nice to try making one. There’s a playful side to it, but it’s also a project with a purpose. And while I’m doing it, I’m also thinking at a meta level about the agent workflow.
+
+
+## Design Work That Requires Taste and the Limits of Evaluators    *70:59*
+
+<span class="paragraph-timestamp" data-ts="71:00">71:00</span> **Jonghyun Park** As someone who knows nothing about design, you said that design wasn’t very good, but to my eyes, I can’t even really recognize whether it’s bad or not. I don’t have the ability to act as an evaluator that assigns a scalar score for design—specifically, for what constitutes good design— in my head. That’s because I’ve hardly ever done this kind of work in my life.
+
+<span class="paragraph-timestamp" data-ts="71:24">71:24</span> **Seungjoon Choi** But the reverse is also true. No matter how much aesthetic discernment you have, if you don’t know terms like DP or backprop, you can’t instruct the model to do it.
+
+<span class="paragraph-timestamp" data-ts="71:38">71:38</span> **Jonghyun Park** Then, if I think of my brain as an LLM and draw a comparison, for me to become good at design, I would need to go through a process of instilling in my brain an intuition for what good design is. So if, as you mentioned earlier, an LLM— say, a large frontier model—grew even larger, and a foundation model emerged that could properly evaluate entirely new design elements, you think it would become possible to create a good font by hill climbing in some way, right?
+
+<span class="paragraph-timestamp" data-ts="72:10">72:10</span> **Seungjoon Choi** Right. For example, when I actually run the kinds of things Dwarkesh asked about, many of the runs involving experiments and measurements here take more than 30 minutes. That’s because it measures the entire range of different spaces, finds the axes, and then tests them in the next run. So because this is costly, I have to develop a sense of the design— in other words, which direction to take—as I work.
+
+<span class="paragraph-timestamp" data-ts="72:39">72:39</span> But at some scales, it can run quickly enough for hill climbing to work, and what I want is for the decision-making itself to be included in the loop. But under the current regime, it seems possible in some domains, while my understanding is that it doesn’t work well in the non-verifiable domain.
+
+<span class="paragraph-timestamp" data-ts="72:59">72:59</span> And Dwarkesh’s point, ultimately, is that to run RL at a large, truly massive scale, because there are elements that depend on taste, without that, the model's RSI might be SI rather than RSI, which I think is the implication.
+
+<span class="paragraph-timestamp" data-ts="73:19">73:19</span> **Jonghyun Park** Only within a predetermined space, only within the limits of a frontier model's intelligence, can it push things all the way; I think it cannot go beyond
+
+<span class="paragraph-timestamp" data-ts="73:29">73:29</span> **Seungjoon Choi** that limit. That's what I mean. So it was about exploring something outside the current regime.
+
+<span class="paragraph-timestamp" data-ts="73:37">73:37</span> **Chester Roh** I have an image of it in my head, but if I had to explain it, it really would be difficult.
+
+<span class="paragraph-timestamp" data-ts="73:42">73:42</span> **Seungjoon Choi** So being capable of abstraction itself on its own seems to be Sutton's short-term goal. That's why it caught my eye.
+
+<span class="paragraph-timestamp" data-ts="73:54">73:54</span> **Jonghyun Park** I've also recently been trying to solve a similar problem. Something where I had to do the design myself—for example, just yesterday, for something we're planning to launch, I was making the business card myself, and I did better than expected, but I still couldn't quite get it right. Once I got it to a certain point, I realized that not knowing what constitutes good design was the fundamental problem to begin with.
+
+<span class="paragraph-timestamp" data-ts="74:18">74:18</span> When I ask whether an LLM is better at it than I am, I do feel that it is. That's because, to begin with, I have a brain that isn't good at design, but if I had spent about ten years living and working hard at design, would I have been good at it? I think I would have been much better than I am now.
+
+<span class="paragraph-timestamp" data-ts="74:43">74:43</span> But as I thought about that, I wondered how I could push the LLM further and make it better at design than it is now, beyond my own capabilities, while at the same time thinking, to do that well, I ultimately need to be good at it myself. Between those two thoughts, I couldn't determine which was the right answer. Especially in cases involving taste and things like that. Everyone has a different opinion, Sutton is trying to approach it this way, Dwarkesh seems to think it can't be done, and some people seem to think that simply scaling up the LLM will inevitably make it work.
+
+
+## Sutton's Vision of Running a 1T Model on 20 Watts    *75:19*
+
+<span class="paragraph-timestamp" data-ts="75:16">75:16</span> **Seungjoon Choi** I don't think this is a binary choice. Sutton absolutely wasn't undervaluing LLMs either. But we need to explore diversity, and conversely, working backward, what if an innovation suddenly emerges? From an approach other than LLMs. If that happens, as long as the current infrastructure still uses GPUs, some parts would remain applicable, but Sutton's target is 20 watts. Running a 1T model on 20 watts. Right now, it requires an enormous amount of power, and Moore's law isn't holding up very well at the moment, but if we nevertheless keep advancing somehow by using methods like these, I asked what would happen if, within ten years, something that requires 2,000 watts today could be done with 20 watts, and Sutton began imagining it.
+
+<span class="paragraph-timestamp" data-ts="76:06">76:06</span> So, much like the human brain, at a much lower wattage— though we probably don't measure humans in watts— in any case, even if the power requirement dropped like that, what would happen if we ran something around 1T? That's what Sutton was imagining. And Sutton sees the timeframe in which that becomes possible as somewhere between five and ten years from now. But suppose it does happen. Then what would happen to the disruption of the industries being built today? I think questions like these are also interesting points to imagine.
+
+<span class="paragraph-timestamp" data-ts="76:39">76:39</span> **Chester Roh** Right, but if you try to predict that now, you'll probably fail as an investor. I think you need to predict the next year or two before you can see what comes after that, so just because Sutton is supposedly going to do something like that five or ten years from now, stopping investments on the assumption that all the infrastructure currently being built around Transformers will fail, or not including it in your portfolio, would be a foolish choice.
+
+<span class="paragraph-timestamp" data-ts="77:05">77:05</span> **Seungjoon Choi** Right. These are people who survived and overcame the AI winter. Doing what others weren't doing—that still seems important, but that doesn't mean the current regime is going to fail. It was just about imagining that possibility.
+
+<span class="paragraph-timestamp" data-ts="77:21">77:21</span> **Chester Roh** Either way, the essence of it will be a function of the total amount of computation, so even though we have the latest frontier models, just as we cobble together a hundred absurd things and somehow put them to use, today's architecture won't become useless. At least in terms of computation.
+
+<span class="paragraph-timestamp" data-ts="77:39">77:39</span> **Seungjoon Choi** I hear A100s are still being used too. I heard that A100s still haven't been completely retired.
+
+
+## The Structure of Work Through Auto Research and the Control Plane    *77:45*
+
+<span class="paragraph-timestamp" data-ts="77:44">77:44</span> **Chester Roh** Broadly speaking, this is auto research. If we can clearly define the objective and the evaluation metric, and that's all we need to do, then within those parameters, it can find the answer on its own and continue to evolve. If you look at our vibe coding as a process, people are essentially doing auto research within it. They build something, look at the evaluation, see that something is wrong and try again, and if that evaluation metric can be structured to some extent, the entire process can be formed into a loop, and the kind of design required to do that isn't an engineering problem but comes back to questions of philosophy and management, and if we can design something like that, we'd be able to keep the loop running for a long time.
+
+<span class="paragraph-timestamp" data-ts="78:31">78:31</span> **Seungjoon Choi** So what I do with designers around me is share this with them and pose challenging questions, such as, as a thought experiment, if we're talking about typesetting, you could take those delightful parts of a book you like, scan them as samples, and these days, with continuous iterative improvement, a multimodal model can replicate how something looks at an almost pixel-perfect level. So you could first fit it into SVG, then identify things in that fitting such as the principles of typesetting and principles that proxy the mindset of a particular designer, and until everything is covered, until the rubric is covered, iteratively improve it to extract a particular style. If so, I thought there might be nothing preventing this from working at least for typesetting.
+
+<span class="paragraph-timestamp" data-ts="79:24">79:24</span> Then what does the typesetting designer's job become? How does it shift? Of course, because this is interpolation of what these models sampled, it merely speeds up production at that level; it has not discovered some new level of typesetting. It has only increased productivity. But even so, when that has an impact, how will the work shift? When posing questions like that, I use this example. So it gets me thinking about all sorts of things.
+
+
+## Extracting Editing Styles and Proxying Human Work    *79:55*
+
+<span class="paragraph-timestamp" data-ts="79:55">79:55</span> **Chester Roh** Yes.
+
+<span class="paragraph-timestamp" data-ts="79:56">79:56</span> **Jonghyun Park** I'm doing exactly that as well. Editing video is similar. The way I first tried it was, I kept showing it how I edit as an editor, and I also can't really articulate how I edit. That's because I just do it intuitively. So I feed all of that in, let it run a loop here, set an evaluation metric that gets it to produce exactly what I would, and have it extract my style, and that style gets extracted: the way I do things. Then, when I run the next task using that, it becomes my proxy, one similar to me, and it really does become similar.
+
+<span class="paragraph-timestamp" data-ts="80:33">80:33</span> **Seungjoon Choi** I would imagine what Chester does is similar too, isn't it? Chester's way of working, I mean.
+
+<span class="paragraph-timestamp" data-ts="80:36">80:36</span> **Chester Roh** It's all the same. That is really all of us applying this overarching methodology of deep learning. I still think the things Seungjoon mentioned earlier are isomorphic repetitions occurring over and over at different layers. In an LLM, that model becomes the Transformer model we know, and there's an optimization algorithm, where the objective and evaluation work in the same way. Then, if we take this up a level to a more abstract level, there's the editing process, or in my case, running a company, and then, in terms of the issue we're discussing now, deciding what to do with the font—we can simply call the object itself the code and artifact. We treat that as the model and go through the process of optimizing it.
+
+<span class="paragraph-timestamp" data-ts="81:23">81:23</span> Then all those layers are isomorphic. If you optimize it enough, you're left with a usable product. Then the role left for us is still, for now, to set the objective and evaluate the resulting output, and the quality of that is directly tied to the model's output.
+
+<span class="paragraph-timestamp" data-ts="81:47">81:47</span> I don't have the answer either, but when we say this is a certain domain or a certain space, no one knows how large it is or to what extent it has a beginning and an end, do they? So we don't know whether this lies within or outside that domain. For example, if that space is extremely vast, interpolating between one point and another might simply look like novelty to us, or there is a possibility that it might look like extrapolation.
+
+<span class="paragraph-timestamp" data-ts="82:23">82:23</span> **Seungjoon Choi** That's exactly what's happening in mathematics these days.
+
+<span class="paragraph-timestamp" data-ts="82:26">82:26</span> **Chester Roh** What Seungjoon, Jonghyun, and I are feeling is all very similar right now. As frontier model performance has come up, our expectations of them, as well as the quality and volume of our work, have increased enormously. What began with simply going back and forth with a single agent has now become layering everything into multi-agent systems and figuring out how to make them do more work per unit of time, how to have them read the trace of the work I've done and make certain decisions in my place, and how to have them perform evaluation. Everyone's attention is now focused on building systems like these.
+
+
+## Multi-Agent Iterative Evaluation and Changes in Personal Work Practices    *82:39*
+
+<span class="paragraph-timestamp" data-ts="83:02">83:02</span> **Chester Roh** So people who have built those systems well run short of tokens, and I do too. I used to feel that I had weekly tokens left over, but these days, all my weekly tokens are used up in about two or three days. The reason they're used up in just two or three days is that I used to guide the model step by step within the bounds of what I knew, but as I kept working, I developed a desire to make it perform well even in areas I don't know, so I've been having the model repeatedly run through this evaluation loop. If it doesn't work, keep iterating, and even after three iterations, if there are still no issues, bring it to me then. That's the kind of thing I have it do.
+
+<span class="paragraph-timestamp" data-ts="83:38">83:38</span> Has it gone through a routine that ensures a certain level of quality? Enforcing that is what I referred to as the so-called control plane. Within a certain evaluation metric, have you met everything you committed to doing? You haven't? Then I won't accept the work. If I don't accept the result, the sub-agent has to go through the loop again. To meet those requirements. “Oh, I can't meet this, this, and this. I'll run it again.” Then it goes back and tries again.
+
+<span class="paragraph-timestamp" data-ts="84:07">84:07</span> In that way, the work I would otherwise have to do— perhaps something I could have finished just by looking at it once— I make it iterate through, deliberately causing it, in the process, to generate a tremendous number of by-products. That thing Seungjoon mentioned a while back — building a large network of those by-products— as it works among them, I also make unexpected discoveries. “So this was all it took. Good job.” Then, in turn, I adjust my own weight.
+
+<span class="paragraph-timestamp" data-ts="84:37">84:37</span> **Seungjoon Choi** I learn so much. Especially with these names, you only need to know what they're called.
+
+<span class="paragraph-timestamp" data-ts="84:43">84:43</span> **Chester Roh** Right. And if I just give it a rough concept, asking, “Is there something like this?” it finds it for me. Because it already knows all of this. There used to be an algorithm like this, and if I say, “Let's try doing it that way based on this,” and then say, “All right, bring me that paper and that codebase,” it really feels like plugging in a jack in Matrix, instantly loading helicopter piloting skills into my head, and that's it. I experience my tools being extended just like that. So Jonghyun has probably had the same experience, but what I feel while working with it is that something from Matrix has become real. I can simply tell it what to do, and if there's something I want, I can think, “This will be possible.”
+
+<span class="paragraph-timestamp" data-ts="85:26">85:26</span> **Seungjoon Choi** It's a matter of imagination.
+
+<span class="paragraph-timestamp" data-ts="85:28">85:28</span> **Chester Roh** Right. But thinking, “This is possible,” also makes me lazy and keeps me from starting it.
+
+<span class="paragraph-timestamp" data-ts="85:35">85:35</span> **Jonghyun Park** It becomes like simply plugging in a jack— that's what I wanted to say as well.
+
+<span class="paragraph-timestamp" data-ts="85:39">85:39</span> **Chester Roh** I was thinking about it. But looking at the things you're doing, compared with what you used to do, you're doing some truly unbelievable things now. The things you show us are fascinating to me. But all of us have now risen to the frontier level.
+
+<span class="paragraph-timestamp" data-ts="85:57">85:57</span> **Seungjoon Choi** One last thing I'd like to point out is that everything I just showed you, except for the 3D model earlier, was done through a web interface. It wasn't Claude Code or Codex. You can do this much through a web interface too.
+
+
+## A Frontier-Grade Work Environment Enabled by Web Interfaces Alone    *85:58*
+
+<span class="paragraph-timestamp" data-ts="86:11">86:11</span> **Chester Roh** Did you do all of that just by describing it?
+
+<span class="paragraph-timestamp" data-ts="86:13">86:13</span> **Seungjoon Choi** Not just by describing it, but through the website or a typical chat interface. Though they're not exactly typical chat interfaces. ChatGPT's Work and Claude Cowork. But in Claude's case, even regular chat gives you a container, so it's extremely convenient.
+
+<span class="paragraph-timestamp" data-ts="86:30">86:30</span> So without necessarily doing things on your local computer through a CLI or desktop app, you can simply launch a browser in the container and view everything there. So I wanted to point out that this is actually something even developers aren't aware of right now. That side keeps evolving too.
+
+<span class="paragraph-timestamp" data-ts="86:51">86:51</span> **Chester Roh** So I think things like Claude Cowork should really be seen as being the same as Codex. That's probably how we should look at them. And after a little more time passes, perhaps in another year or so, we may no longer have a reason to buy powerful computers for local computing. If we simply put the work in some container in the cloud, spare computing resources could be allocated dynamically, and wouldn't we reach a point where the work completes itself?
+
+<span class="paragraph-timestamp" data-ts="87:20">87:20</span> As I've been using OpenClaw and Hermes Agent, you know, one of those computers at home that runs always-on. I've installed it on my DGX too, and built everything on top of it, but unless it's something where I need to check the visuals in real time, such as the UI or video editing, if it's just text-based work, I don't even turn on my computer. I simply give text-only instructions to the Operator Agent I'm building, and I've set it up to handle all the work, so in practice, you could say I also do that work entirely through a web interface.
+
+
+## Operator Agents and the Future of Work Automation    *87:51*
+
+<span class="paragraph-timestamp" data-ts="88:03">88:03</span> **Chester Roh** how the work I do could run without me, even without me, and as a result, a lot of things are happening. There were some parts where the discussion didn't flow in a perfectly organized way, but this is part of the exploration too. Yes, I learned a lot.
+
+<span class="paragraph-timestamp" data-ts="88:21">88:21</span> **Seungjoon Choi** It was fun.
+
+<span class="paragraph-timestamp" data-ts="88:22">88:22</span> **Chester Roh** All right, then we'll wrap things up here for today.
+
+<span class="paragraph-timestamp" data-ts="88:26">88:26</span> **Seungjoon Choi** Sounds good. Understood.
+
+<span class="paragraph-timestamp" data-ts="88:28">88:28</span> **Chester Roh** Yes,
+
+<span class="paragraph-timestamp" data-ts="88:28">88:28</span> **Jonghyun Park** Great work, everyone.
+
+<span class="paragraph-timestamp" data-ts="88:29">88:29</span> **Chester Roh** Thank you.

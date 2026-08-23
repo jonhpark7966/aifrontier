@@ -53,9 +53,9 @@
       "effort": "low"
     },
     "fast_subtitle_split": {
-      "model": "gpt-5.3-codex-spark",
-      "effort": "high",
-      "status": "allowlisted"
+      "model": "gpt-5.6-luna",
+      "effort": "medium",
+      "note": "spark 접근권 상실로 luna 교체 (2026-08-24 사용자 지시)"
     },
     "blog_paragraph_split": {
       "model": "gpt-5.6-luna",
