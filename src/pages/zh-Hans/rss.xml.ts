@@ -11,7 +11,7 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: 'AI Frontier (中文)',
-    description: 'AI深度对话播客 - 卢正锡、崔升准',
+    description: 'AI深度对话播客 - 卢正锡、崔升准、朴钟贤',
     site: context.site || 'https://aifrontier.kr',
     items: sortedEpisodes.map((episode) => ({
       title: `${episodeLabel('zh-Hans', episode.data)}: ${episode.data.title}`,

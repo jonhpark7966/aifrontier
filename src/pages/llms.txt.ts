@@ -23,8 +23,8 @@ export async function GET(context: APIContext) {
 
   const lines: string[] = [
     '# AI Frontier',
-    '> AI 심층 대화 팟캐스트 — 노정석, 최승준, 김성현이 인공지능의 최신 기술·산업·철학을 깊이 있게 이야기합니다.',
-    '> A bilingual (Korean/English) deep-dive AI podcast by Chester Roh, Seungjoon Choi, and Seonghyun Kim.',
+    '> AI 심층 대화 팟캐스트 — 노정석, 최승준, 박종현, 김성현이 인공지능의 최신 기술·산업·철학을 깊이 있게 이야기합니다.',
+    '> A bilingual (Korean/English) deep-dive AI podcast by Chester Roh, Seungjoon Choi, Jonghyun Park, and Seonghyun Kim.',
     '',
     `- Site: ${site}`,
     `- YouTube: https://www.youtube.com/@chester_roh`,

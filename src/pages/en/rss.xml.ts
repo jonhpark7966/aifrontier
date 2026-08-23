@@ -11,7 +11,7 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: 'AI Frontier (English)',
-    description: 'AI Deep Dive Podcast - Chester Roh, Seungjoon Choi, Seonghyun Kim',
+    description: 'AI Deep Dive Podcast - Chester Roh, Seungjoon Choi, Jonghyun Park, Seonghyun Kim',
     site: context.site || 'https://aifrontier.kr',
     items: sortedEpisodes.map((episode) => ({
       title: `${episodeLabel('en', episode.data)}: ${episode.data.title}`,

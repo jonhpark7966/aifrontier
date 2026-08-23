@@ -11,7 +11,7 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: 'AI Frontier (日本語)',
-    description: 'AI深層対話ポッドキャスト - ノ・ジョンソク、チェ・スンジュン',
+    description: 'AI深層対話ポッドキャスト - ノ・ジョンソク、チェ・スンジュン、パク・ジョンヒョン',
     site: context.site || 'https://aifrontier.kr',
     items: sortedEpisodes.map((episode) => ({
       title: `${episodeLabel('ja', episode.data)}: ${episode.data.title}`,

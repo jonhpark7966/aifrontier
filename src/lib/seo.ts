@@ -265,6 +265,7 @@ export function buildPodcastSeriesJsonLd(input: PodcastSeriesJsonLdInput) {
     author: [
       { '@type': 'Person', name: '노정석', alternateName: 'Chester Roh' },
       { '@type': 'Person', name: '최승준', alternateName: 'Seungjoon Choi' },
+      { '@type': 'Person', name: '박종현', alternateName: 'Jonghyun Park' },
       { '@type': 'Person', name: '김성현', alternateName: 'Seonghyun Kim' },
     ],
   };

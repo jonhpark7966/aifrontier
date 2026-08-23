@@ -24,7 +24,7 @@ export async function GET(context: APIContext) {
     '# AI Frontier — Full Content Index',
     '',
     '> AI 심층 대화 팟캐스트.',
-    '> 노정석(Chester Roh), 최승준(Seungjoon Choi), 김성현(Seonghyun Kim)이 인공지능의 최신 기술·산업·철학을 깊이 있게 대화합니다.',
+    '> 노정석(Chester Roh), 최승준(Seungjoon Choi), 박종현(Jonghyun Park), 김성현(Seonghyun Kim)이 인공지능의 최신 기술·산업·철학을 깊이 있게 대화합니다.',
     '> A bilingual (Korean/English) deep-dive AI podcast exploring cutting-edge AI technology, industry trends, and philosophy.',
     '',
     `Site: ${site}`,
