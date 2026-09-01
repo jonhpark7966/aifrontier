@@ -75,6 +75,9 @@ series: "main"
 ---
 
 ## AI 인프라로 이동하는 가치 포착    *00:00*
+
+![발표자료 1쪽: LLM INFERENCE](/episodes/ep112/slide_01.jpg)
+
 <span class="paragraph-timestamp" data-ts="00:00">00:00</span> **노정석** 녹화를 하고 있는 오늘은 2026년 8월 30일 일요일 아침입니다. 오늘은 HyperAccel의 이진원 CTO님을 모셨습니다. 저희가 요새 소식이 너무 많잖아요. 그런데 소식을 좀 배치해 보면, 저 아래 데이터센터부터 칩, 모델, 그리고 그 위의 애플리케이션까지 다양한 레이어가 있는데, 요새 느껴지는 게 모델 쪽의 발전이 너무 빠르게 일어나다 보니까 이른바 가치 포착이라고 하죠. 돈을 실질적으로 벌어내는 구간이 아래 인프라 쪽으로 이동하는 것, 그리고 위의 좀 더 애플리케이션 쪽으로 이동하는 것, 이 두 가지 트렌드를 저희가 느끼고 있는데요. 오늘은 굉장히 중요한 이야기를 저희가 모시고 수업으로 들을 텐데요. 이 아래쪽에 대한 이야기입니다. 저희가 도대체 전력을 투입해서 칩을 구성하고, 그 안에 training된 모델을 넣어서 고객들에게 어마어마한 inference를 제공하고 있단 말이죠. 그 안에서 어떤 일이 일어나고 있는지, 그리고 그 안의 벤치마크를 읽기 위해서는 무엇을 이해해야 하는지, 저희가 승준님과 함께 이 얕은 지식을 가지고 얼마 전에 Dwarkesh의 roofline analysis를 하면서 inference 이야기를 한 번 다뤘고, 그 이후로도 inference 이야기를 굉장히 자주 하고 있는데요. 자주 하고 있는 이유는 그게 굉장히 중요하기 때문이겠죠. 오늘은 그것의 끝판왕 수업 에디션입니다. 저희 이진원 CTO님의 강연을 한 번 찬찬히 따라오시면 SemiAnalysis에서 새롭게 나오는 각종 벤치마크들, 그리고 NVIDIA에서 발표하는 것들, 또 칩 회사에서 발표하는 것들을 이해하실 수 있게 되니까요. 오늘 모시고 한 번 들어보도록 하겠습니다. CTO님, 어서 오십시오.
 
 <span class="paragraph-timestamp" data-ts="01:48">01:48</span> **이진원** 안녕하세요. 반갑습니다. 오랜만에 또다시 출연했습니다.
@@ -87,17 +90,33 @@ series: "main"
 
 ## 영원한 compute 부족과 폭발하는 토큰 수요    *02:13*
 
+
+![발표자료 2쪽: “ We used to talk for years at OpenAI about](/episodes/ep112/slide_02.jpg)
+
 <span class="paragraph-timestamp" data-ts="02:16">02:16</span> **이진원** 시작해 볼까요? 오늘 제가 말씀드릴 내용은 inference engineering과 관련된 이야기입니다. 지금 여러분도 AI를 굉장히 많이 쓰고 계실 텐데, 도대체 주로 쓰이는 GPU 혹은 다른 AI 반도체에서 어떤 일들이 일어나고 있는지를 어려운 내용이지만 제가 최대한 쉽게 오늘 설명해 드릴 거고요. 저희 회사와 관련된 이야기를 먼저 앞부분에서 하고, 본격적으로 시작해 보도록 하겠습니다. 이게 올해 4월에 Sam Altman이 OpenAI Forum에서 이야기했던 내용을 가져온 건데, 여기 보시면 compute crunch라고, compute가 굉장히 부족한 세상에 살고 있는데 거기서 언제 벗어날 수 있을 거냐, 이런 이야기를 OpenAI 사람들과 수년간 해 왔는데, 지금 생각으로는 아마 앞으로 우리가 영원히 이것을 벗어나지 못할 것 같다. 그러니까 우리가 항상 compute가 부족한 세상에 살 거라는 이야기를 하고 있어요. 그만큼 training이든 inference든 compute가 부족한 상황에 있습니다.
 
 <span class="paragraph-timestamp" data-ts="03:24">03:24</span> 그걸 또 잘 보여 주는 게 5월 Google I/O에서 발표한 건데, 자기네 GCP에서 토큰 사용량을 조사해 봤더니 월간 사용량이 12개월 만에 50배로 늘었다고 발표했고요. 그리고 제가 작년 9월에 AI Infrastructure Summit이라는 곳에 갔는데, 그때 Google에서 또 나와서 발표하기를 그로부터 두 달 만에 다시 2배가 늘어서 14개월 만에 100배가 됐다는 이야기를 했어요. 그리고 지금은 어떻게 됐느냐? 다시 거기서 또 많이 늘어서 처음 2024년과 비교해서 330배 정도로, 엄청난 폭발적 수요가 있다는 이야기를 계속하고 있고요. 모델도 다들 잘 아시지만 계속 커지고 있습니다. 여기 나와 있는 것은 비공식 추정도 있고, 최근에 Fable 5가 8T 파라미터 정도 된다는 이야기도 들었는데, 한동안 모델이 많이 커지지 않는 것처럼, 수T 파라미터에서 더 커지지 않는 것처럼 보이다가 Mythos는 10T 파라미터라는 이야기도 있을 정도로 모델 스케일도 다시 커지고 있습니다.
+
+
+![발표자료 6쪽: 수요](/episodes/ep112/slide_06.jpg)
+![발표자료 7쪽: 인프라](/episodes/ep112/slide_07.jpg)
+![발표자료 8쪽: 인프라· 한국](/episodes/ep112/slide_08.jpg)
+![발표자료 9쪽: 인프라](/episodes/ep112/slide_09.jpg)
 
 <span class="paragraph-timestamp" data-ts="04:25">04:25</span> 그리고 이걸 소화하기 위해서 전 세계적으로 데이터센터를 엄청나게 짓고 있죠. GW 데이터센터라고 해서, 여기 보시면 오른쪽에 2030년까지 데이터센터에 약 6.7조 달러 정도, 그러면 이게 대충 한화로 따지면 거의 1경 원 정도 될 것 같은데요. 그리고 우리나라도 지금 4대 메가프로젝트라고 해서 2035년까지 18.4GW 규모로 우리나라 땅에 데이터센터를 짓겠다고 하고 있고요. 이렇게 하다 보니까 다들 많이 이야기하시다시피 전기가 문제입니다. 전력을 어떻게 공급할 거냐에 대한 이야기를 누구나 다 하고 있고, 여기 보면 미국에서 데이터센터를 지어서 거기에 전기가 들어오는 데까지 평균 5년 정도 걸리더라. 그리고 우리나라 수도권에서 데이터센터 전력 심사를 하면 절반 이상 탈락하더라는 이야기들이 계속 나오고 있고요. 그래서 전력이 굉장히 문제고, 또 하나는 이것도 Dwarkesh 팟캐스트에 나왔던 건데, Anthropic이 지금 3년 연속 매출을 10배씩 성장시키는 회사가 되고 있는데, 이 프론티어 랩들에서 compute, 즉 연산은 1년에 3배씩 더 늘리고 있습니다.
 
 ## 매출·compute 격차가 밀어 올리는 inference 단가    *05:17*
 
+
+![발표자료 10쪽: 컴퓨트가격](/episodes/ep112/slide_10.jpg)
+![발표자료 11쪽: 컴퓨트가격](/episodes/ep112/slide_11.jpg)
+
 <span class="paragraph-timestamp" data-ts="05:35">05:35</span> **이진원** 그러면 1년에 3.3배씩 간극이 벌어지게 되는데요. 그럼 GPU compute는 3배씩 더 늘어나는데 매출은 10배 늘어나는 이 간극을 어떻게 해석할 거냐 하면, 세 가지 방법이 있는데요. 첫 번째는 inference할 때 마진을 올려서 매출을 늘리는 방법이 있겠죠. 그런데 지금 이미 Anthropic의 inference 마진이 70~80%라고 알려져 있고, 이게 상한이 90%라고 보면 거의 올라갈 여지가 얼마 남지 않았습니다. 그리고 두 번째는 내가 GPU를 100개, 100대를 가지고 있으면 그중 지금은 70대를 training에 쓰고 30대를 서비스에 쓰고 있다면, 그 비중을 5 대 5로 늘려서 inference에 사용하는 GPU 비중을 늘리면 거기서 매출이 발생할 테니까 똑같은 compute로 매출을 올릴 수 있는 방법이 되겠죠. 그런데 지금 대략 5 대 5 정도 되는 것으로 알려져 있는데, 이것을 더 늘리기는 힘들다고 사람들이 많이 이야기하고 있습니다. 왜냐하면 training에 쓰는 비중을 줄인다는 것은 모델 개발에 힘을 빼겠다는 것이고, 그러면 지금 이 프론티어 랩들은 생존이 힘든 상황이잖아요. 그래서 이것도 많이 올리기는 힘든 상황입니다. 그러면 남은 건 무엇이냐 하면, 결국에는 compute의 단가가 오르는 것밖에 없고요. 그래서 지금 neocloud 회사들이나 이런 회사들에서도 굉장히 수익이 잘 나고 있고, 단기 임대하면 장기 임대보다 2배 이상 비싸게 줘야 하고, 이런 식으로 실질적으로 compute 단가도 많이 오르고 있는 추세입니다.
 
 ## HBM 대신 LPDDR을 택한 HyperAccel Bertha 칩    *07:17*
+
+
+![발표자료 12쪽: HyperAccel](/episodes/ep112/slide_12.jpg)
 
 <span class="paragraph-timestamp" data-ts="07:20">07:20</span> **이진원** 그래서 왜 앞에 이런 배경을 깔았느냐 하면, 저희가 만드는 칩이 Bertha라고 하는 칩이고요. 이게 저희의 첫 번째, 저희 회사에서 만든 첫 번째 데이터센터형 AI 반도체고, 저희 제품의 특징은 모두가 쓰고 있는 HBM을 쓰지 않고 LPDDR이라고 하는 저전력 DDR 메모리를 사용했다는 것입니다. 그래서 이를 통해 얻을 수 있는 것은 전력 소모량도 HBM을 쓰는 칩들에 비해 더 적을 수 있고요. 그리고 무엇보다 HBM은 굉장히 비싸고 구하기도 힘든데, 저희는 DDR을 쓰기 때문에 굉장히 저가에 공급할 수 있습니다. 그래서 여러분이 쓰시는 AI 서비스의 비용을 획기적으로 낮출 수 있는 그런 제품을 기획해서 만들었고요. 지금 Samsung 4nm 공정으로 만들었고, 올해 3월 말에 이 칩이 나와서 저희가 지금 열심히 bring-up을 하고 있습니다.
 
@@ -127,6 +146,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="11:38">11:38</span> **이진원** 공교롭게도 NVIDIA가 인수한 Groq도 LPU라는 이름을 쓰고 있고 저희도 LPU라는 이름을 쓰고 있는데 저희가 사실 LPU라는 이름을 훨씬 더 먼저 썼습니다. Groq은 원래 처음에 TSP, Tensor Streaming Processor라는 이름을 가지고 있다가 나중에 LPU라는 이름으로 바꿨어요. 그런데 Groq의 LPU가 더 유명하다 보니까 많이 질문하시는데, LPU가 뭐냐, 또 새로운 종류의 NPU 같은 거냐고 물어보시는데 이건 그냥 이름이고요. 큰 의미에서는 다 똑같은 NPU의 하나고 저희는 단독으로 동작할 수 있습니다. GPU도 PCIe 카드 형태로 나오는 제품들이 있잖아요. 그것과 똑같다고 생각하시면 됩니다.
 
+
+![발표자료 13쪽: AI 반도체](/episodes/ep112/slide_13.jpg)
+
 <span class="paragraph-timestamp" data-ts="12:16">12:16</span> 그래서 최근 소식을 하나 또 말씀드리면, 아까 제가 말씀드렸던 Hot Chips라고 하는 곳에서 OpenAI가 Jalapeño라고 하는 굉장히 재미있는 이름으로 지은 AI 반도체, 자체적으로 제작한 AI 반도체를 공개했고요. HBM4를 그것도 썼습니다. 지금 HBM4를 쓰는 GPU도 Rubin에 가서야 NVIDIA가 HBM4를 쓰고 있고요. 지금 Blackwell 시리즈는 다 HBM3E로 되어 있는데, 그래서 가장 앞선 메모리 기술을 사용했고 좀 독특한 점은 OpenAI의 Jalapeño 아키텍처와 저희 Bertha라고 하는, 앞에 소개해 드렸던 제품의 아키텍처가 굉장히 유사합니다.
 
 <span class="paragraph-timestamp" data-ts="12:58">12:58</span> 그래서 저희가 Hot Chips에 가서 데모를 할 때 많은 분이 오셔서 너희가 OpenAI 아키텍처와 굉장히 비슷한 것 같다, 이런 얘기를 많이 해 주셨어요. 저희도 그렇게 많이 느꼈고요. 조금 설명해 드리면, 이렇게 HBM이 있고 저희도 DDR이 옆에 있는데, 여기서 오는 데이터들을 여기에 인접해 있는 core에서 바로 받아서 연산하는 구조로 되어 있고 그 연산 결과들을 여기 안에 있는 core들끼리 이렇게 공유하는 구조도 저희와 Jalapeño가 굉장히 유사해서 저도 완전히 다른 곳에서 다른 시기에 개발했는데 이렇게 비슷비슷할 수도 있구나, 재미있게 생각하고 있습니다.
@@ -147,6 +169,9 @@ series: "main"
 
 ## LLM inference의 두 단계인 prefill과 decode    *15:01*
 
+
+![발표자료 14쪽: LLM 추론의구조](/episodes/ep112/slide_14.jpg)
+
 <span class="paragraph-timestamp" data-ts="15:01">15:01</span> **이진원** 그러면 본격적으로 시작해 보도록 하겠습니다. 맨 처음에 LLM inference가 어떻게 되는지부터 간단하게 살펴보고 가면, 사용자가 넣어 주는 prompt라고 하죠. 그게 입력으로 들어오면, 예를 들어 여기 지금 "Is tomato a fruit?"라고 물어봤다고 하면, 이 LLM이 동작해서 연산을 열심히 한 다음에 "Yes"라고 하는 첫 번째 token을 뱉어 주게 됩니다. 그래서 사용자가 이걸 편의상 4개의 token이라고 할게요. 한 단어를 token이라고 치환해서 4개의 token을 입력으로 줬을 때 그 4개의 token을 한 번에 연산해서 첫 번째 다음 token인 "Yes"를 뱉어 주는 데까지의 과정을 prefill이라고 하고요.
 
 <span class="paragraph-timestamp" data-ts="15:39">15:39</span> 그다음부터는 이게 autoregressive하게 계속 돌아가면서 그다음에 "Yes"가 입력으로 들어오면 다시 LLM이 한 번 연산해서 다음 "it"이라고 하는 token을 뱉어 주고 그다음에는 "it"이 들어가서 "is"가 나오고 "is"가 들어가서 만약 end-of-sentence라고 하는 EOS, 문장이 끝났다는 token이 나오면 이 iteration이 종료됩니다. 그래서 여기 빨간색으로 표시된, 이렇게 한 token이 들어가서 다음으로 한 token이 나오는 과정을 decode phase라고 부르게 됩니다. 그래서 이 LLM이 inference하는 과정은 prefill과 decode, 이렇게 두 단계로 나뉘어 있습니다.
@@ -159,9 +184,15 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="17:21">17:21</span> **최승준** 저도 질문이 하나 있습니다. 석현 대표님 때도 나왔었는데, TTFT라고, time to first token이 파란색에서 빨간색 사이에
 
+
+![발표자료 15쪽: 구조](/episodes/ep112/slide_15.jpg)
+
 <span class="paragraph-timestamp" data-ts="17:27">17:27</span> **이진원** 있는 게 맞습니다. 이 까만색 입력이 들어가서 "Yes"가 나올 때까지의 시간이 TTFT, time to first token이고요. 그다음에 "Yes"가 들어가서 "it"이 나오는 이 decode의 한 iteration을 TBT라고도 하고, time between tokens라고도 하고 TPOT라고도 합니다. Time per output token이라고도 하고, 여러 가지 용어가 조금씩 다른데요. 의미가 아주 살짝 다르기는 하지만 혼용해서 사용해도 크게 문제는 없습니다. 그러면 LLM iteration 안에 도대체 뭐가 있는지 살펴보겠습니다. 이 안에 Transformer라는 알고리즘이 있는데, 한 번 더 요약해 보면 위에서부터 아래로 내려가는 방향인데요. 처음에 token이 들어오면 요즘은 position embedding도 안쪽에서 하긴 하는데, RoPE를 하죠. 그게 attention 안으로 들어와 있는데, 어쨌든 token이 들어오면 중요한 건 제가 색깔을 칠한 attention이라는 걸 하고 그다음에 feed-forward network, FFN이라고 부르는 걸 통과하고 다시 이걸 계속 반복한 다음에 제일 마지막에 LM head라고 하는 데 가서 다음 token이 뭔지를 선정하게 됩니다. 그런데 여기에 모델이, 우리가 100B짜리 모델이라고 하면 그 모델 parameter들이 존재하게 되는데, 그 parameter가 attention과 feed-forward network에 어느 정도 비율로 존재하는지를 보면 attention이 대략 20%, 그리고 FFN이 80% 정도 돼요. 그러니까 4 대 1 정도로 FFN이 더 많은 parameter를 갖고 있는 거죠. 그런데 이건 dense model, 우리가 MoE라고 하는 최근에 많이 사용하는 모델이 아닐 경우에 그렇고, MoE 모델로 가면 이 비율은 훨씬 더 FFN 쪽이 많아지게 됩니다. 그래서 parameter는 attention에 생각보다 많지 않다. 우리가 Transformer 하면 attention이 핵심이라고 생각하지만, 핵심인 것도 맞고요. 그런데 Transformer에서 가장 중요한 연산은 이 두 개라고 볼 수 있고요.
 
 ## Transformer의 핵심 연산 attention과 FFN    *17:57*
+
+
+![발표자료 16쪽: 차원](/episodes/ep112/slide_16.jpg)
 
 <span class="paragraph-timestamp" data-ts="19:19">19:19</span> **이진원** 그래서 그걸 조금 더 볼 건데, 그걸 보기 전에 도대체 우리가 이 Transformer에 입력으로 넣어 주는 것과 출력으로 나오는 것의 차원을 볼 필요가 있어요. 차원은 3차원입니다. 첫 번째 차원은 batch, 여러 개의 request가 오면 그걸 동시에 처리할 때의 batch고요. 그다음은 token의 개수예요. 그러니까 아까 제가 "Is tomato a fruit?"라고 물어봤을 때 4개의 token이 있었죠. 그 4개의 token, 그리고 한 token을 몇 차원의 vector로 표현할 건지, 그에 대한 3차원 입력이 들어가게 되고 출력도 사실은 3차원인데, 아까 보셨다시피 prefill에서는 사용자가 몇 단어, 몇 token짜리 입력을 줄지 모릅니다. 최대 100만 token까지도 줄 수 있게 되어 있죠. 그래서 이게 1보다 커지지만 결과로 나오는 건 한 token만 나오기 때문에 여기가 1이 됩니다. 그래서 이 1을 지우고 보면 사실상 2차원이라고 볼 수 있는 거죠. 그리고 decode에서는 항상 한 token이 들어가서 한 token이 나오는 구조이기 때문에 batch를 생각하지 않았을 때 이 prefill의 출력과 같은 형태의 데이터가 돌아다닌다고 이해하시면 될 것 같습니다.
 
@@ -169,11 +200,17 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="20:38">20:38</span> **최승준** 맞습니다. 이게 좀 헷갈려요. 이 token이 처음에는 ID로, 정수나 자연수였다가 이제부터 얘기하면 vector인 거잖아요, 여기서는?
 
+
+![발표자료 17쪽: 구조](/episodes/ep112/slide_17.jpg)
+
 <span class="paragraph-timestamp" data-ts="20:45">20:45</span> **이진원** 그게 여기 token dimension에서 vector로 바뀌는, 원래 여기가 scalar였다가 vector로 바뀌는 거고요. 그래서 attention 안을 보면 Query, Key, Value라고 하는 게 있고 아까 입력으로 들어왔던 이 token 하나당 여기 만약 embedding 차원을 10차원이라고 하면 10개의 숫자로 단어 하나를 표현, token 하나를 표현하는 거죠. 그 token embedding vector를 가져와서 여기에 어떤 weight parameter, 이게 model parameter죠. 그것들을 각각 곱해서 행렬 연산을 하는 거죠. 그래서 Query, Key, Value로 만듭니다. 그러면 여기서 의문이 드는 게 입력이 3차원인데 얘는 2차원이거든요. 이걸 어떻게 곱하나 생각하실 수 있는데, 쉽게 말씀드리면 B 곱하기 S를 그냥 flatten해서 예를 들어 여기 B가 5고, sequence가 2고 D가 10이었다면 5 곱하기 2 곱하기 10을 앞의 두 개를 곱해서 10, 10 곱하기 10의 행렬로 만든 다음에 연산한다고 생각하시면 쉬울 것 같아요. 그래서 이걸 곱해 QKV를 생성하고, 그다음에 Query, Key, Value끼리 연산합니다. 먼저 Query와 Key를 내적한 다음에 행렬 곱을 하고 softmax라는 걸 한 다음, 다시 Value를 곱해서 연산하는데, 이걸 self-attention이라고 부르고요.
 
 ## QKV 연산과 self-attention 구조    *20:50*
 
 <span class="paragraph-timestamp" data-ts="22:08">22:08</span> **이진원** 그런데 이걸 head 여러 개로 나눠서 똑같은 연산을, 그러니까 여기서 생성된 QKV를 다 잘라서 head가 16개라면 16조각을 낸 다음에 그 조각난 것들끼리 self-attention을 하고 나중에 다시 하나로 합치는데, 그걸 head merge라고 합니다. 그래서 merge할 때는 이 결과들을 다 concatenation해서 붙인 다음에 또 여기에 어떤 weight parameter를 한 번 곱해서 결과를 뽑게 됩니다. 그러면 이 결과가 그 이후의 여러 연산, residual connection 같은 것들을 거쳐서 FFN으로 넘어가게 되고요. FFN은 크게 보면 두 개의 linear layer로 되어 있어요. 그냥 weight를 두 번 곱하는 거죠. 물론 여기에 gate라고 하는 게 최근에는 추가돼서 조금 복잡해졌지만, layer 두 개짜리 neural net이 있는 거라고 생각하시면 될 것 같아요. 그래서 여기에 연산을 위한 parameter가 많이 들어 있다는 얘기고요.
+
+
+![발표자료 18쪽: 핵심구분](/episodes/ep112/slide_18.jpg)
 
 <span class="paragraph-timestamp" data-ts="23:08">23:08</span> 이걸 개념적으로 생각해 보면 attention이라고 하는 것은 이것들을 다 Query, Key, Value로 만든 다음에, 예를 들면 이것의 Query와 얘네의 Key, 얘의 Key, 모든 Key와 vector 내적을 하거든요. 그게 행렬 곱으로 나타나는 거고, 그래서 attention은 token들끼리의 관계를 학습하는 것이라고 보시면 되고, FFN에 들어가면 아까 제가 한 token을 몇 개의 숫자로 표현할 거냐, 10개라고 하면 10차원 vector로 표현한다고 했잖아요. 그 10차원 vector를 이루는 숫자들끼리 연산하는 게 FFN 쪽입니다. 그러니까 token들 간의 연산은 attention이고, token 하나 안에서 그 vector 차원들끼리 연산하는 게 FFN이라고 생각해 주시면 좋을 것 같아요.
 
@@ -187,6 +224,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="25:18">25:18</span> **이진원** 그냥 이런 게 있구나 생각하시면 됩니다.
 
+
+![발표자료 19쪽: KV cache](/episodes/ep112/slide_19.jpg)
+
 <span class="paragraph-timestamp" data-ts="25:24">25:24</span> **노정석** 네, 사실 이게 한 step이잖아요. 이 transformer 논문을 이해하고, 이 안의 dimension들이 어떻게 돌아가는지 PyTorch 코드까지 하나하나 이해가 돼야 transformer가 그 뒤에 좀 자연스럽게 와닿는 건데, 그전에는 개념적으로 아무리 들여다봐도 이해하기 어려운 것은 어쩔 수 없는 사실입니다. 그러니까 그 부분에 대해서는 개념적으로 attention block이 있고, FFN block이 있고, compute가 어디에 많이 쓰이고, 무엇은 이런 거구나 하는 정도만 알고 계셔도 충분히 뒤에 있는 내용들을 따라오실 수 있습니다.
 
 <span class="paragraph-timestamp" data-ts="26:00">26:00</span> **최승준** 새로운 부분이 있는 것 같아요. channel-wise라는 걸 까먹고 있었어요.
@@ -199,6 +239,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="27:48">27:48</span> **노정석** 그렇죠. 이게 저희가 항상 얘기하는 KV cache인 거죠. 앞에서 저희가 다른 데서 뉴스 기사를 가져와서 2천 자짜리를 넣어 prefill했다면, KV cache에 그 앞의 2천 자가 전부 들어 있는 거죠.
 
+
+![발표자료 20쪽: KV cache](/episodes/ep112/slide_20.jpg)
+
 <span class="paragraph-timestamp" data-ts="28:00">28:00</span> **이진원** 그걸 다 가지고 와야 합니다. 그래서 이 KV cache를 저장하는 메모리 공간이 많이 필요하게 되겠죠. 그래서 도대체 KV를 저장하는 데 token 하나당 얼마나 용량이 필요한지를 계산해 보면, 이건 Llama 3.1의 70B 모델을 가지고 계산한 겁니다. 여기서 2는 Key와 Value가 있으니까 두 개가 필요해서 2를 곱한 거고요. N은 layer의 수입니다. 모든 layer마다 attention을 해야 하기 때문에 layer 개수만큼 필요하고, 그다음에 Key, Value는 아까 그
 
 ## Token당 320KB로 폭증하는 KV cache 용량과 GQA    *28:15*
@@ -207,7 +250,13 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="28:35">28:35</span> **이진원** multi-head attention이 기본인데, transformer 알고리즘에서는, Llama 3.1에서는 grouped-query attention을 사용합니다. Grouped-query attention은 뭐냐면, 여기 GQA라고 되어 있는데, 이건 head마다 원래는 Query 하나, Key 하나, Value 하나가 있어야 하는데, 예를 들어 head 여덟 개를 묶어서 여덟 개마다 Query는 여덟 개가 있지만 Key와 Value는 하나씩만, 여덟 개당 하나씩만 갖게 하는 것이라고 생각하시면 됩니다. 그다음에 head 개수를 곱하고, Key, Value 하나당 몇 byte로 저장할 거냐, 보통 BF16이나 FP16으로 저장하면 2byte가 되겠죠. 그래서 이걸 쭉 계산해 보면 대략 320KB, token당 320KB가 됩니다. 그래서 이걸 만약 128K, 12만 8천 token의 context를 Key, Value로 저장한다고 하면 40GB 정도의 용량이 필요해요. H100 한 장에 80GB의 메모리가 있으니까, 그것의 절반입니다. 한 사용자가 만약 128K context를 사용하면 40GB의 Key, Value가 필요합니다. 그것도 70B 모델에서 그런 겁니다. 만약 이게 1T 모델로 가면 엄청나게 커지겠죠.
 
+
+![발표자료 21쪽: 모델비교](/episodes/ep112/slide_21.jpg)
+
 <span class="paragraph-timestamp" data-ts="29:51">29:51</span> 그래서 생각보다 Key, Value의 용량이 크다는 걸 보여드리려고 다양한 open-source 모델에서 어떤 attention을 사용하고, 그에 따라 token당 Key, Value의 용량이 어떻게 되고 context가 늘어나면 얼마나 용량이 늘어나는지를 표로 정리한 건데요. 여기 보시면 최근에 나오는 중국산 open-source 모델들은 조금 작아진 걸 보실 수 있어요. 여기에는 attention 종류가 좀 다른 것들이 있잖아요. 그래서 이런 attention에서 Key, Value가 많이 생성되는 걸 압축하기 위한 여러 기법을 사용해서 이걸 많이 줄이려고 합니다. 줄이지 않으면 여기 보시는 모델을 저장하는 용량보다도 Key, Value를 저장해야 하는 메모리 용량이 더 많아질 수 있거든요. 그래서 이런 것들이 생기고 있습니다.
+
+
+![발표자료 22쪽: 서빙규모](/episodes/ep112/slide_22.jpg)
 
 <span class="paragraph-timestamp" data-ts="30:45">30:45</span> 그리고 추가로 이걸 돌리려면 GPU가 몇 장 필요한지, batch를 32, 그러니까 32명에게 서비스할 거고 context가 평균적으로 128K라고 했을 때 얼마나 필요한지, GPU 개수를 여기에 쭉 써 놓은 건데요. 이런 H100 같은 경우에는 Llama 3.1 405B를 serving하려면 27개가 필요합니다. 이건 저장 공간으로만 나눈 거고, 실제로는 8의 배수로 써야 하니까 32개 정도 필요하게 되겠죠.
 
@@ -217,6 +266,9 @@ series: "main"
 <span class="paragraph-timestamp" data-ts="31:36">31:36</span> **이진원** 그렇죠. 그것까지 생각하면
 
 <span class="paragraph-timestamp" data-ts="31:41">31:41</span> **이진원** 피곤. 그런 건 inference engineering을 하는 엔지니어들한테 맡기시고 편하게 쓰시면 됩니다.
+
+
+![발표자료 23쪽: 용량대책](/episodes/ep112/slide_23.jpg)
 
 <span class="paragraph-timestamp" data-ts="31:48">31:48</span> **박종현** 프론티어 모델들은 그래서 요금제에서 subscription 말고 API에 돈을 내고 쓰면 그 cache를 얼마나 유지하고 있고 내가 쓰던 prompt가 cache hit가 나면 가격이 한 10분의 1인가요? 엄청 싸게 깎아주잖아요. 그런 게 다 저 KV cache를 들고 있어서 가능한 가격 정책인 거죠. 일반 사용자는 신경 쓰지 않아도 그냥 cache가 다 유지되고 있다고 볼 수 있겠죠.
 
@@ -229,25 +281,43 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="33:33">33:33</span> 그다음에 KV를 저장할 공간이 부족하니까 Mooncake 같은 데서 나오는 건 이걸 CPU에 있는 메모리로 옮기거나 아니면 SSD로 내려놨다가 필요할 때 다시 가져와서 쓰는 방법을 많이 이야기하고 있어요. 이건 agentic AI가 나오면서 KV가 생성되는 게 이전의 reasoning model과도 비교가 안 될 정도로 지금 더 많은 KV가 생성되고 있어서 도저히 이걸 메모리에 다 담을 수도 없고 뒤에서 말씀드리겠지만, 사람이 시켜놓고 딴짓하다가 agent가 오래 걸리니까 와서는 “다 끝났네.” 하고 그러잖아요. 그 기간 동안 서버가 이걸 비싼 HBM 메모리에 KV를 계속 담고 있을 수가 없어서 이렇게 다른 메모리로 옮겨 놓는 방법들도 많이 사용하고 있습니다.
 
+
+![발표자료 24쪽: 성능의물리학](/episodes/ep112/slide_24.jpg)
+
 <span class="paragraph-timestamp" data-ts="34:25">34:25</span> **최승준** inference 전용 chip으로 할 때 이런 식으로 KV를 다루는 아키텍처들이 계속 변화해도 이미 구운 반도체로 다 대응이 되는 거예요?
 
 <span class="paragraph-timestamp" data-ts="34:37">34:37</span> **이진원** 그건 상황에 따라 다를 수 있는 거죠. 그래서 보통은 고려가 안 되어 있을 가능성이 꽤 많고요. 왜냐하면 이렇게 공간이 넘친다는 생각을 예전에는 많이 못 했을 거라서요. 그런데 새롭게 나오는 것들은 그런 것들의 활용을 많이 고려해서 만들려고 하고 있습니다. 그다음에 용량에 대한 이야기를 넘어서 CPU든 GPU든 제가 그래서 XPU라고 했는데 XPU 성능을 정하는 건 단순하게 보면 두 가지예요. 하나는 어떤 연산에서 A와 B를 더한다고 했을 때 A도 B도 처음에는 메모리에 있겠죠. 그래서 A를 읽어오고 B를 읽어온 다음 그 결과를 더해서 그걸 C라고 하면 그 C를 다시 메모리에 저장하는 이런 단순한 연산이 있다고 했을 때 메모리에서 데이터를 읽어와야 하는 것과 그다음에 연산해야 하는 것, 이 두 가지 연산이 있는데 이 둘 중에 뭐가 더 빠르냐에 따라서 성능이 한쪽에서 병목을 겪게 됩니다. 왜 그러냐면 지금 제가 예를 든 건 A와 B를 읽어서 연산한 다음 그 결과를 메모리에 저장하는 직렬화된 연산으로 설명을 드렸지만 실제로는 이렇게 되는 게 아니고, A와 B를 읽어서 A 더하기 B를 하고 있는 동안 다음에 연산할 C와 D를 또 읽고 있거든요. 그래야 이 연산이 끝나자마자 다음 C와 D를 또 더할 수 있는 거죠. AI에서는 병렬 처리를 해야 하고 똑같은 연산을 굉장히 많이 해야 하다 보니까 이런 일이 자연스럽게 일어나게 되는데 GPU든 NPU든 이런 것들이 1초에 연산을 몇 개나 할 수 있느냐, 이것과 메모리에서 데이터를 얼마나 빨리 공급해 줄 수 있느냐, 이 두 가지에 따라 병목이 생기게 됩니다.
 
 ## 연산 병목과 메모리 병목의 구분    *35:01*
 
+
+![발표자료 25쪽: Ridge point](/episodes/ep112/slide_25.jpg)
+
 <span class="paragraph-timestamp" data-ts="36:22">36:22</span> **이진원** 보통은 읽어오는 데이터에 비해 연산을 훨씬 많이 할 수 있게 되어 있어요. 예를 들어 H100 같은 경우를 보면 BF16 기준으로, 16bit 데이터 기준으로 1PFLOP/s 정도 연산할 수 있는데요. 1,000TFLOP/s 정도인데, 메모리에서 읽어오는 건 1초에 3.35TB를 읽을 수 있어요. 그러면 이게 실제로 BF16이면 이것의 절반만큼 데이터의 개수가 되겠죠. 왜냐하면 데이터 1개가 2byte니까요. 그러면 이 비율을 대략 따져보시면 그냥 나누면 300인데, 그래서 이 둘이 딱 균형을 이루는 시점, 연산과 메모리 중 어느 하나도 느리거나 빠르지 않고 균형을 이루는 시점을 계산해 보면 대략 300 정도 되는 겁니다. 이걸 ridge point라고 하고요. 예를 들어 이게 만약에 이건 하드웨어적인 수치고, 내가 어떤 AI 모델을 돌리는데 그 모델을 돌리는 kernel이라는 프로그램이 메모리에서 데이터를 한 번 읽었을 때 연산을 200번밖에 못 하게 되어 있다. 그러면 이건 메모리 쪽에 병목이 생기게 되는 거고, 이 모델은 데이터를 한 번 읽어오면 연산을 1,000번 할 수 있다. 그러면 데이터를 한 번 읽어서 1,000번 연산하려고 하는데 지금 300번밖에 연산하지 못하는 상황이잖아요. 그래서 연산기가 적어서 더 빨리 할 수 있는데도 연산기가 부족한 상황이 되니까 이럴 때는 compute-bound가 됩니다.
 
 ## Arithmetic Intensity의 정의와 데이터 재활용    *37:48*
+
+
+![발표자료 26쪽: Arithmetic Intensity](/episodes/ep112/slide_26.jpg)
 
 <span class="paragraph-timestamp" data-ts="37:51">37:51</span> **이진원** 그래서 이 AI라는 게 Artificial Intelligence가 아니고 Arithmetic Intensity, 산술 강도라고 하는 건데 메모리에서 1byte의 데이터를 읽었을 때 얼마나 많은 연산을 할 수 있느냐, 그걸 이야기하게 됩니다. 이게 조금 어려운 개념일 수도 있는데 제가 예를 들어서 설명해 볼게요. 아까 처음에 예를 들었던, 이 4개의 “토마토가 과일이니?”라고 물어봤던 4개의 token이 이렇게 4차원의 vector로 표현됐다고 했을 때 어떤 weight를 곱해서 이런 연산을 많이 하게 되겠죠. query를 생성할 때도 이런 연산을 할 거고 FFN에 가도 이런 연산을 하게 될 텐데 물론 matrix 크기는 조금씩 다르겠지만 제가 간단하게 설명하기 위해서 그냥 4×4 matrix로 표현해 봤습니다. 그러면 이 weight parameter 입장에서 보면 이 W11이 곱셈에 몇 번 사용되는지를 보면 네 번 사용되겠죠. 이것과도 곱해질 거고, 저것과도 곱해질 거고, 그래서 이 데이터 W11은 하나를 읽어왔을 때 연산을 최대 몇 번 할 수 있느냐고 하면 네 번 할 수 있는 겁니다. 그게 Arithmetic Intensity예요. 정확하게 이야기하면 AI 반도체나 GPU에서는 곱셈을 한 번 하면 덧셈을 한 번 합니다. 왜냐하면 여기에서 이 vector와 이 vector를 내적하는 거라서 이것들끼리 결과를 다 더해야 하잖아요. 곱셈과 덧셈이 반드시 한 쌍으로 같이 일어나기 때문에 연산을 두 번으로 세기는 하는데 한 번이냐 두 번이냐가 중요한 게 아니고 지금 차수가 그렇게 된다는 겁니다.
 
 <span class="paragraph-timestamp" data-ts="39:20">39:20</span> 결국 이 Arithmetic Intensity가 무엇에 영향을 받는지 딱 보시면 token의 개수에 영향을 받겠죠. 그리고 이 token의 개수는 아까 제가 맨 처음에 원래 입력은 3차원인데 입력으로 들어갈 때는 batch 곱하기 token sequence length를 합쳐서 하나로 만든다고 했잖아요. 그러니까 여기에 다른 batch의 데이터도 아래로 쌓여 있다면 그것까지 포함되는 겁니다. 그래서 batch 곱하기 sequence length만큼의 Arithmetic Intensity를 갖게 되겠죠. 예를 들어 batch가 1이라고 쉽게 가정해 보고 token을 100만 개 썼다고 하면 Arithmetic Intensity가 100만이 되는 겁니다. 반대로 decode에 오면 이게 하나잖아요. 그래서 W11이라고 하는 것은 한 번밖에 사용되지 않습니다. 그래서 이때는 Arithmetic Intensity가 1이에요. 그리고 이 Arithmetic Intensity라는 게 조금 다른 이야기인데, 반도체에서 굉장히 중요합니다. 왜냐하면 메모리에서 데이터를 한 번 읽어서 연산을 많이 한다는 건 많이 활용한다는 거잖아요. 반대로 이야기하면 같은 연산을 했을 때 메모리에서 읽는 횟수가 줄어든다는 뜻이겠죠.
 
+
+![발표자료 27쪽: Arithmetic Intensity](/episodes/ep112/slide_27.jpg)
+
 <span class="paragraph-timestamp" data-ts="40:23">40:23</span> 이게 왜 중요하냐면, 여기 보시면 곱셈 한 번과 덧셈 한 번에 소모하는 에너지에 비해서 이 SRAM은 심지어 chip 안에 있는 메모리인데 SRAM이나 HBM이나 DDR에서 읽을 때 소모하는 에너지를 보시면 자릿수가 몇 개나 차이 나는 건가요? 엄청나게 차이 나죠. 자릿수가 네댓 개 차이 날 정도로 에너지를 많이 소모하기 때문에 우리가 저전력을 이야기할 때 가장 중요한 건 메모리에서 데이터를 얼마나 적게 읽고 적게 쓰느냐, 이게 굉장히 중요합니다. 그게 Arithmetic Intensity와도 연관되어 있는 거죠. 조금 다른 이야기였고요. 그래서 Roofline analysis라는 게 나오는데 이게 유명한 David Patterson을 비롯한 몇 분이 2009년에 논문으로 낸 건데 아까 ridge point라고 한 이건 하드웨어가 결정되면 그려지는 선이에요. 어떤 모델과 상관있는 선이 아니고 하드웨어의 성능을 표현해 주는 그래프인데요. 이 ridge point가 연산과 메모리 어느 쪽에도 병목이 없는 상태고요.
 
 ## Roofline analysis로 읽는 compute-bound와 memory-bound    *40:58*
 
+
+![발표자료 28쪽: Roofline](/episodes/ep112/slide_28.jpg)
+
 <span class="paragraph-timestamp" data-ts="41:29">41:29</span> **이진원** 이걸 그리는 방법은, 여기 지금 평평한 이 선은 반도체가 낼 수 있는 최대의 연산 능력이에요. 아까 H100이 한 1PFLOPS 정도 연산을 할 수 있다고 얘기했는데 그게 여기입니다. 여기 y축을 따라가면 y축에 1천 TFLOPS 정도가 나오는 거고요. 그다음에 이 기울기는 로그-로그 스케일로 그리면 기울기가 1인데, 여기 y절편에 해당하는, y축과 만나는 점이 바로 bandwidth가 됩니다. 이게 기울기가 항상 1이기 때문에 bandwidth가 올라가면 이 경사면이 올라가겠죠. 그러면 ridge point가 왼쪽으로 옮겨가겠죠. 데이터를 더 빨리 공급해 주니까 arithmetic intensity가 더 낮은 지점에서 ridge point가 형성되는 거고, 반대로 bandwidth는 그대로 두고 compute를 올리면 이 수평선이 위로 올라가는 거라서 이런 식으로 올라가게 됩니다.
+
+
+![발표자료 29쪽: Roofline](/episodes/ep112/slide_29.jpg)
 
 <span class="paragraph-timestamp" data-ts="42:26">42:26</span> 그래서 이 그래프를 보고 뭘 알 수 있냐면, ridge point보다 오른쪽에 있으면 compute-bound인 거고요. x축이 arithmetic intensity입니다. 어떤 모델을 돌리는데, 아까 제가 얘기한 것처럼 prefill에서 weight를 읽어왔는데 이 weight로 100만 번 연산을 할 수 있어요. 그러면 여기가 295니까 100만은 굉장히 오른쪽에 있겠죠. 그러니까 여기는 데이터를 한 번 읽어서 100만 번 연산할 수 있는데 연산기가 300번밖에 연산을 못 해주네. 그래서 이걸 300번씩 여러 번 수행해서 100만 번 할 때까지 기다려야 되는 상황이기 때문에 compute-bound인 거고, 반대로 왼쪽으로 가면, 아까 decode일 때는 메모리에서 데이터를 읽어서 연산을 한 번밖에 못 하니까요. 그런데 메모리에서 데이터가 300분의 1로 느린 속도로 오고 있잖아요. 그러니까 그만큼 성능이 굉장히 떨어지게 되는 거죠.
 
@@ -255,7 +325,14 @@ series: "main"
 
 ## Batching으로 올리는 decode 효율과 attention의 한계    *43:46*
 
+
+![발표자료 30쪽: 배칭](/episodes/ep112/slide_30.jpg)
+![발표자료 31쪽: 어텐션의예외](/episodes/ep112/slide_31.jpg)
+
 <span class="paragraph-timestamp" data-ts="44:27">44:27</span> **이진원** 그런데 여기서 굉장히 심각한 문제가 생기는데, attention은 batching을 늘려도 arithmetic intensity가 올라가지 않습니다. 왜 그러냐면, 내가 질문한 것의 key-value와 다른 사람이 질문한 것의 key-value가 다르잖아요. 그래서 query와 key를 곱할 때 보면 query가 벡터였고 key가 행렬이었는데, 그 행렬을 공유하지 못하는 거죠. batch들끼리 앞에서 query를 생성하거나 key를 생성하거나 value를 생성할 때는 같은 weight를 곱하니까 서로 다른 사용자들의 토큰들을 모아서 연산할 수 있었지만, 이게 내 output token의 query라고 하면 이게 key-value들의 모음이라고 하면 다른 사용자는 이 key-value를 쓰면 안 되잖아요. 그래서 여기는 arithmetic intensity를 절대로 올리지 못하는 곳입니다. 여기는 여전히 1로 남아 있어야 하는 상황인 거죠. 그래서 attention에서 병목이 많이 생기고요. 특히 최근에는 콘텍스트 길이도 길어지다 보니까 이 부분이 굉장히 큰 병목이 되고 있어요.
+
+
+![발표자료 32쪽: 어텐션대책](/episodes/ep112/slide_32.jpg)
 
 <span class="paragraph-timestamp" data-ts="45:27">45:27</span> 그래서 사람들이 가만히 있지 않겠죠. attention에서도 arithmetic intensity를 올려보자는 게 앞에서 얘기했던 GQA 같은 걸 쓰면 8개당 key-value 하나니까 query 8개를 모아서 key matrix와 곱해주니까 8만큼 arithmetic intensity가 되겠죠. 원래 1에서 8로 올라가는 거고, MQA도 multi-query attention이라고 해서 query가 16개 있으면 16개 전체에 대해서 key와 value는 하나씩만 쓰는 거거든요. MLA도 똑같은데, MLA는 그 key-value마저 압축해서 쓰는 거고요. 그래서 이런 경우에는 몇 개의 query당 key-value 하나를 할당하느냐만큼 arithmetic intensity가 올라가게 되고요. 그다음에 우리가 프롬프트를 ChatGPT나 Claude한테 주면 우리한테는 보이지 않지만 그 앞에 system prompt라든지 여러 가지 tool에 대한 얘기라든지 주의사항 같은 것들이 들어가잖아요. 그 앞에 들어가는 부분은 항상 똑같이 들어가기 때문에 hidden prompt에 대한 key-value를 미리 계산해 놨다가 그건 공유해서 쓰자는 게 prefix caching 방법입니다. 이렇게 하면 그 부분에서 좀 이득이 있겠죠. 그리고 key-value 자체의 크기를 줄이면 같은 bandwidth에서 더 많은 key-value를 읽어올 수 있으니까 그것도 효과가 있겠죠. 그래서 사용하는 방법이 key-value를 8비트나 4비트로 양자화해서 가져오는 방법이고, 이런 것들을 attention에서도 arithmetic intensity를 올리는 방법으로 사용하고 있습니다.
 
@@ -267,7 +344,13 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="48:50">48:50</span> 그리고 여기서 또 한 번 여러분께 위로를 드리고 넘어가면, 이것들이 머리에 지금 딱 박히지 않아도 괜찮습니다. 이것들을 다 이해하지 않으셔도 상관없고, 대략 이러한 것들이 inference의 economics, 추론의 경제학 안에서 이것들을 해석하기 위해 일어나는 생각의 틀이고 engineering의 최전선이라고 받아들여 주시면 괜찮습니다.
 
+
+![발표자료 33쪽: 트래픽의주인](/episodes/ep112/slide_33.jpg)
+
 <span class="paragraph-timestamp" data-ts="49:19">49:19</span> **이진원** 그래서 다음으로 할 얘기는, 그러면 우리가 예를 들어서 어떤 양자화 같은 걸 적용해서 메모리 공간도 조금 더 효율적으로 쓰고 같은 bandwidth에서 더 많은 데이터를 읽고 싶다고 했을 때 뭘 양자화하는 게 효과가 있는지 보려면 도대체 어떤 게 데이터 양이 더 많은지와 연관될 수밖에 없어요. 다시 앞의 용량 얘기로 돌아갈 수밖에 없는데, 이것도 앞에서 Llama 3.1 70B, BF16 기준으로 했을 때 가중치가 대략 141GB, weight가 그 정도 되는데 key-value가 더 많아지는 게 43만 1천 토큰을 쓰면 key-value가 더 많아지게 됩니다. 이게 batch 1일 때 기준이고요. batch가 늘어나면 늘어날수록 batch 곱하기 sequence length가 아까 그 arithmetic intensity에 해당하는 거고, 그만큼 key-value가 생성되다 보니까 batch가 늘어나면 늘어날수록 당연히 key-value의 양이 weight의 양을 추월하는 시점의 토큰 개수가 점점 줄어들게 되겠죠.
+
+
+![발표자료 34쪽: 트래픽의주인](/episodes/ep112/slide_34.jpg)
 
 <span class="paragraph-timestamp" data-ts="50:24">50:24</span> 그리고 이게 128K에서 key-value의 용량이 얼마나 되는지를 계산한 건데, 보시면 512 batch에서 22TB 정도입니다. 그러니까 사실상 512명을 동시에 하나의 서버 혹은 한두 개의 서버에서 serving하는 건 불가능하다는 걸 여기서 보실 수 있을 거예요. 그래서 이건 양이 많다는 걸 보여드리려고 한 거고요.
 
@@ -276,9 +359,15 @@ series: "main"
 ## Interactivity와 throughput의 trade-off    *51:33*
 
 
+
+![발표자료 35쪽: InferenceX](/episodes/ep112/slide_35.jpg)
+
 <span class="paragraph-timestamp" data-ts="51:33">51:33</span> **이진원** 맞습니다. 그리고 benchmark에 대한 얘기를 좀 해보려고 하는데요. 도대체 그러면 어떤 AI 반도체 혹은 어떤 GPU가 좋은 거냐? 이런 얘기를 저희도 많이 듣습니다. “너희 게 얼마나 좋아?” 이런 얘기를 듣지만, 이게 딱 하나의 숫자로 “우리가 어디보다 몇 퍼센트 좋습니다.” 이렇게 얘기하기가 굉장히 어렵습니다. 왜냐하면 조건들이 너무나 다양하기 때문인데요. 그래서 대표적인 게 한 사용자가 얼마나 빠르게 토큰을 받느냐, 사용자당 tokens per second죠. 1초에 몇 토큰을 서비스받는지, 이걸 interactivity라고 합니다. 그리고 서버 입장에서 나는 지금 여러 명에게 serving하고 있는데, 그 여러 명에게 serving하는 토큰 전체의 총합, 초당 전체 토큰 총합을 GPU 개수로 나눠서 GPU당 1초에 얼마나 많은 토큰을 생성하고 있는지, 이게 사용자 한 명에게 가는 건지 100명에게 가는 건지 상관없이 다 합친 걸 throughput이라고 부릅니다.
 
 <span class="paragraph-timestamp" data-ts="52:34">52:34</span> 제가 오늘 아침에도 이걸 녹화하려고 회사에 오면서 배가 고파서 맥도날드에 가서 맥모닝을 시켰는데, 안에서 만드는 게 보이는데도 한참 기다려도 안 나오길래 봤더니 여러 명의 빵을 하나씩 탁탁탁탁 놓고 만드시더라고요. 그게 throughput을 늘리는 거고, 저는 제일 앞에 주문한 사람이었거든요. 그러니까 저의 interactivity는 굉장히 안 좋은 상황이 됐던 거죠. 그래서 지금 드리고 싶은 얘기는 throughput을 올리다 보면 interactivity를 어느 정도 희생할 수밖에 없다는 얘기를 드리고 싶어서, 오늘 아침에 문득 그걸 보니까 딱 이 생각이 나더라고요.
+
+
+![발표자료 36쪽: InferenceX](/episodes/ep112/slide_36.jpg)
 
 <span class="paragraph-timestamp" data-ts="53:14">53:14</span> **박종현** 이게 지난번 고석현 대표님 편에서 말씀하셨던 한 명의 토큰 속도를 쭉 올리기 위해서는 다른 걸 희생해야 한다고 얘기했던 그 지점이었던 것 같습니다.
 
@@ -286,7 +375,14 @@ series: "main"
 
 ## SemiAnalysis InferenceX Pareto curve 읽는 법    *54:26*
 
+
+![발표자료 37쪽: InferenceX](/episodes/ep112/slide_37.jpg)
+![발표자료 38쪽: InferenceX](/episodes/ep112/slide_38.jpg)
+
 <span class="paragraph-timestamp" data-ts="54:57">54:57</span> **이진원** 이걸 직관적으로 생각해 보시면, 아까 제가 KV cache는 사용자가 늘어나면 늘어나는 만큼 계속 늘어난다고 했잖아요. 그래서 사용자 1명에게만 서비스할 때는 그 1명에 대한 KV cache만 읽어오면 되지만, 10명에게 서비스하면 KV cache도 10배의 데이터를 읽어와야 되고, 그걸 가지고 attention을 해서 10명에 대해 다 해줘야 다음 layer로 넘어가고, layer가 100개면 그걸 100번 반복해야 하는데, KV cache를 읽어오는 시간이 사용자가 늘어나는 만큼 오래 걸리기 때문에, 그리고 KV cache 양이 많다고 했잖아요. 그것 때문에 사용자 한 명이 느끼기에는 당연히 속도가 느려질 수밖에 없는 겁니다. 그래서 개념적으로 그렇게 생각하시면 되고요. 실제 그래프를 보여드리면 이런 식으로 되어 있습니다. 오른쪽에 보시면 각각의 GPU들, NVIDIA와 AMD GPU들이 있고요. 왼쪽에 있는 게 throughput이 높고 사용자 interactivity가 낮은 거고, 오른쪽이 빠른 거라고 생각하시면 돼요.
+
+
+![발표자료 39쪽: 41](/episodes/ep112/slide_39.jpg)
 
 <span class="paragraph-timestamp" data-ts="55:52">55:52</span> **최승준** 앞에서 이렇게 파레토 프론티어 그래프를 그렸을 때는 하나의 GPU를 상정한 거고, 여기서는 여러 개를 쓴다는 건가요?
 
@@ -310,6 +406,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="58:12">58:12</span> **이진원** 그것도 사실 이 점 안의 configuration 하나로 들어가 있기는 해요. disaggregation이라는 걸 뒤에서 말씀드리겠지만, 하느냐 안 하느냐에 따라서도 굉장히 차이가 많이 납니다.
 
+
+![발표자료 40쪽: InferenceX](/episodes/ep112/slide_40.jpg)
+
 <span class="paragraph-timestamp" data-ts="58:21">58:21</span> **박종현** 유저의 요구 사항인 토큰 수와 interactivity가 정해지면, 내가 어떤 GPU를 샀을 때 throughput이 얼마가 나오니까 수요를 채우면 얼마를 벌 수 있을지, 투자 회수를 계산하는 데나 모델링하는 데도 충분히 쓰일 수 있을 것 같습니다.
 
 <span class="paragraph-timestamp" data-ts="58:34">58:34</span> **노정석** SemiAnalysis가 이걸 하는 이유가 정확하게 그거겠죠. 그래서 예를 들어 ChatGPT나 Anthropic이 어떤 기계를 사서 어떤 cloud를 만들어서 유저에게 얼마를 받고 있는데, 이들이 돈을 벌고 있느냐, 돈을 잃고 있느냐, 이런 것들이 이 그래프를 보면 대략 다 역산되겠죠.
@@ -327,6 +426,9 @@ series: "main"
 <span class="paragraph-timestamp" data-ts="59:57">59:57</span> **노정석** 회사는 이미 엄청나게 수익성이 높고요. 투자도 한 번도 받지 않았고, 그다음에 이런 report를 프론티어 랩들의 economics가 어떻게 되고, 이 회사들이 투자하는 것 대비 2, 3년 내에 어떤 형태의 curve에 이르게 될지, 이런 것들을 전 세계 회사들에 report로 팔고 있는데, 알고 싶은 사람은 굉장히 많잖아요. 저희만 해도 이렇게 궁금한데, 이 엄청난 대기업들은 더 궁금하지 않겠습니까? 그래서 그들이 굉장히 많은 돈을 잘 내고 있는 걸로 알고 있습니다.
 
 <span class="paragraph-timestamp" data-ts="1:00:26">1:00:26</span> **이진원** 그때 저희가 ICML에 갔을 때 한 번 만나서, 저희도 그 이후에 온라인으로 여러 번 미팅했고요.
+
+
+![발표자료 41쪽: vLLM](/episodes/ep112/slide_41.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:00:35">1:00:35</span> **노정석** 저희 AI Frontier와 SemiAnalysis가 지난 7월 ICML 기간에 파티를 했었죠. Lablup에서요. 그때 한국에 있는 많은 칩 회사와 대기업들, SemiAnalysis 사이의 교류를 저희가 한 번 주선한 적이 있습니다.
 
@@ -348,6 +450,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="1:05:00">1:05:00</span> **노정석** 그거죠. 그렇죠, 최적화죠. 어떻게 빈 버스로 출발하는 걸 줄이고, 사람들을 꽉꽉 채워서 보내느냐. 맥도날드 햄버거 예제와 고속터미널의 버스 예제와 KTX의 승객 예제, 이런 게 다 똑같은 최적화 문제이죠.
 
+
+![발표자료 42쪽: vLLM](/episodes/ep112/slide_42.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:05:15">1:05:15</span> **이진원** 그다음에 PagedAttention이라고 하는 게 있는데, 이건 뭐냐면 우리가 아까 KV를 caching한다고 했잖아요. 그러면 KV를 메모리에 저장해야 하는데, 도대체 ChatGPT나 Claude나 Gemini가 몇 token, 몇 단어로 대답할지 우리는 모르는 상태잖아요. 몇 단어를 대답할지 알면 그만큼의 KV가 나온다는 걸 알고 그만큼 메모리를 미리 할당해 놓을 텐데, 그걸 모르니까 내가 낼 수 있는 worst case, 최대로 많이 냈을 때, 최대로 답을 길게 했을 때를 기준으로 메모리 공간을 잡고 있어야 합니다. 그 요청이 끝날 때까지는요. 그러다 보면 메모리가 실제로는 아까 말씀해 주신 것처럼 짧게 그냥 "안녕"에서 이렇게 짧은 대화를 하는 사람들은 몇 단어, 몇 token 안 하고 끝날 텐데, 그 남은 공간이 다 낭비되겠죠. 그래서 그 낭비를 줄이는 아이디어로, 이것도 굉장히 단순한데 동적으로 메모리를 할당하는 겁니다. page table 개념을 가져오는 거죠. 예를 들어 처음에 첫 번째 output 단어로 Alan이라는 단어가 나왔다고 하면, 그 Alan이라는 단어의 key와 value를 저장하기 위해 메모리 공간을 실제 physical memory의 block 7번에 할당합니다. 그런데 이 공간이 page라서, 예를 들어 4개 단어까지 저장할 수 있는 거예요. 처음에 Alan이 나왔으면 여기에 key와 value를 저장하고, 그다음에 Turing이 나오면 그 옆 칸이 남았으니까 계속 저장하는 거죠. a가 나올 때까지 저장한 다음에 computer라는 단어가 나오면 page가 꽉 찼잖아요. 그러면 그때 새로운 page를 할당하는 거죠. 그래서 여기 block 0번은 지금 physical block 7번과 연결되어 있다. 여기 block 1번은 실제 physical block 1번과 연결돼 있고, 여기 block 2번은 3번과 연결돼 있는데, 여기 filled slot은 지금 한 칸 차 있어. 그러니까 아직 세 칸이 비어 있다고 하는 정보를 알려 주는 거예요. 그래서 이렇게 동적으로 그때그때 메모리에 page를 새로 할당하면 내가 딱 필요한 만큼만 메모리를 쓸 수 있으니까 효율적으로 메모리를 쓸 수 있어서 더 많은 사용자에게 서비스를 제공할 수 있겠다는 개념인 거죠.
 
 <span class="paragraph-timestamp" data-ts="1:07:32">1:07:32</span> 하지만 이것도 좋은 아이디어 같지만 단순하지는 않은 게, worst case로 정말 드물겠지만 모두가 다 worst case로 최대 길이의 output을 뱉어 내게 되면 문제가 생깁니다. 왜냐하면 이건 마치 그런 거죠. 은행에서 사람들이 예금을 인출하지 않으니까 지급준비율을 낮게 가져가는 것과 비슷하게, 메모리 공간을 원래는 worst case를 가정해서 전부 그만큼만 서비스해야 하는데 어차피 다 그만큼 쓰지 않을 테니까 추가로 사용자를 더 받아 주는 거거든요. 그런데 그러다가 모든 사용자가 다 최대의 output을 뱉어 내게 되면 메모리 공간이 부족해지겠죠. 그러면 그때 또 이 KV를 밖으로 쫓아내고 나중에 다시 불러오는 이런 작업들을 해 줘야 하기 때문에 소프트웨어적으로 아주 단순하지는 않습니다. 그런데 대부분의 경우에는 그런 일이 잘 일어나지 않기 때문에 유용하게 쓸 수 있는 거죠.
@@ -360,15 +465,24 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="1:09:24">1:09:24</span> **노정석** 서로가 서로를 모방해서 지금은 다 똑같아져 있습니다.
 
+
+![발표자료 43쪽: vLLM](/episodes/ep112/slide_43.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:09:28">1:09:28</span> **이진원** 그리고 prefix caching도 어떤 요청이 들어오더라도 다 같이 쓰는 것이기 때문에 KV를 미리 계산해서 저장해 놨다가 그냥 가져와서 읽어 쓰자는 거고요.
 
 ## Chunked prefill과 speculative decoding    *1:09:37*
+
+
+![발표자료 44쪽: vLLM](/episodes/ep112/slide_44.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:09:37">1:09:37</span> **이진원** 그다음에 chunked prefill이라고 하는 게 있는데요. 중간에 prefill이 끼어들면 이것 때문에 decode가 느려질 수 있습니다. 원래 얘가 없었으면 빨리할 수 있는 걸 얘 때문에 8,192개 token짜리 prefill이 한 번에 들어오게 되면, 얘네 4개를 같이 묶어서 버스에 태우면 얘 때문에 느려지는 거죠. 아까 ridge point가 300밖에 안 됐으니까 이만큼을 처리하려면 굉장히 많은 iteration을 돌아야 하는 거고, 그만큼 얘네가 얘 없을 때에 비해 느려지게 됩니다.
 
 <span class="paragraph-timestamp" data-ts="1:10:15">1:10:15</span> 그래서 이걸 어떻게 하느냐면, 그냥 같은 크기로 다 잘라 버리는 거죠. 이게 진짜 버스의 개념인데, 잘라서 이 prefill도 나눠서 집어넣는 겁니다. 그리고 이 chunked prefill을 할 때 우선순위가 있는데, 보통의 경우에는 decode에 무조건 우선권을 줍니다. decode가 있으면 decode를 먼저 태워 주는 거죠. 버스에요. 그다음은 prefill 중에 잘려서 앞의 prefill은 갔는데 버스를 못 탄 prefill들을 태워 주고, 마지막에 새로 들어온 애들, 그래도 자리가 남으면 새로 들어온 애들을 태워 주는 식으로 우선순위가 있고요. 그렇게 해야 서비스 품질을 가장 잘 만족시킬 수 있어서 보통은 그렇게 합니다.
 
 <span class="paragraph-timestamp" data-ts="1:10:55">1:10:55</span> 그래서 여기 있듯이 TBT를 낮추고, TBT는 decode와 관련된 거죠. 처음에 이 AI 모델이 대답하기 시작해서 잘 대답하다가 갑자기 중간에 멈추거나 하는 상황이 이것 때문에 생기는 건데, 그걸 줄이고 대신 prefill의 첫 token이 나오는 시간은 조금 희생하겠다는 겁니다. 이렇게 해야 품질이 일정하게 유지되기 때문에 이 방법을 많이 쓰고 있고요.
+
+
+![발표자료 45쪽: vLLM](/episodes/ep112/slide_45.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:11:22">1:11:22</span> 그다음에 마지막으로 speculative decoding인데, 이건 지난번에 고석현 대표님도 많이 이야기하셨던 거고요. DeepSeek에서 DSpark라고 하는 좋은 방법을 내놓아서 속도를 굉장히 높이는 방법인데, 아이디어는 이것도 굉장히 단순합니다. 우리가 autoregressive하게 decode step에서 한 번에 한 token씩 생성하는 그걸 한 번에 여러 token을 생성하게 할 수 없을까 생각하는 거죠.
 
@@ -408,11 +522,24 @@ series: "main"
 
 ## Prefill pool과 decode pool을 나누는 PD disaggregation    *1:18:53*
 
+
+![발표자료 47쪽: Disaggregation · 왜](/episodes/ep112/slide_47.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:18:53">1:18:53</span> **이진원** 넘어가겠습니다. disaggregation 얘기를 좀 하려고 합니다. 그런데 우리가 prefill이랑 decode가 너무 다르다는 얘기는 계속했고, arithmetic intensity가 sequence length 곱하기 batch에 영향을 받고 decode는 attention을 제외하면 batch에만 영향을 받는다, 이렇게 알고 있고요. 그래서 roofline에서 굉장히 멀리 떨어져 있는 것을 알 수 있었죠. 그래서 아까 말씀드렸다시피 chunked prefill을 한다고 하더라도 어쨌든 prefill이 들어오면 decode는 성격이 다르기 때문에 prefill이 많이 들어오면 decode에 영향을 주고 반대로 decode에만 우선순위를 주면 prefill의 TTFT가 안 좋아지기 때문에 간단하게 이걸 나눠서 하자. 그래야 요구되는 SLO를 만족하는 throughput, 그걸 goodput이라고 하는데 goodput을 늘릴 수 있겠다는 개념으로 시작한 겁니다.
+
+
+![발표자료 48쪽: Disaggregation · 간섭](/episodes/ep112/slide_48.jpg)
+![발표자료 49쪽: Disaggregation · 효과](/episodes/ep112/slide_49.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:19:42">1:19:42</span> 그래서 prefill pool과 decode pool을 놓고 이걸 나눠서, 그러니까 Jensen Huang이 Token Factory라는 얘기를 많이 하잖아요. 저는 그게 이런 부분도 있다고 생각하는데 token을 많이 생성한다는 의미도 있겠지만 그것보다는 컨베이어 벨트에서 자동차를 만드는데 어떤 사람은 바퀴를 조립하고 어떤 사람은 문을 끼우고 이런 것처럼 하나하나의 단계에 따라서 그 하나만 하는 pool을 만드는 거죠. 그래서 prefill만 하는 prefill pool, decode만 하는 decode pool을 나눠서 이걸 PD, prefill-decode disaggregation이라고 부릅니다. 그래서 대신 이 prefill에서 만들어진 모든 key-value는 decode pool로 전송해 줘야겠죠. 그래서 disaggregation을 하면 이 사이의 네트워크 속도도 굉장히 중요합니다. 이거는 어느 정도 규모가 있지 않으면 별로 이득이 없어요. 규모가 있을 때 이득이 있는 거고요.
 
+
+![발표자료 50쪽: Disaggregation · 효과](/episodes/ep112/slide_50.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:20:39">1:20:39</span> 그래서 아까 말씀드린 것처럼 raw throughput 측면, 그러니까 token을 얼마나 생성해 내는지의 측면에서 보면 올라가지 않아요. utilization이 똑같다. 얘네들이 다 100%로 돌고 있다. 똑같은 GPU를 쓰더라도 보통 처음에는 Microsoft에서 나온 Splitwise라는 논문에서 처음으로 disaggregation 관련 얘기가 나왔는데 여기 보시면 똑같은 H100 GPU를 가지고 prefill의 개수를 다르게 합니다. 아무튼 개수를 다르게 해서 throughput을 맞춰주는데 이게 어느 정도 규모가 돼야 이득이 있고요. 그다음에 모두 100%로 돈다고 하면, GPU 100개를 어느 정도 비율로 나눴다고 하면 그 100개가 전부 돌고 있으면 생성하는 token은 다 똑같을 거고 해야 하는 연산량이 정해져 있으니까요.
+
+
+![발표자료 51쪽: Disaggregation · 판단](/episodes/ep112/slide_51.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:21:24">1:21:24</span> 하지만 좋아지는 것은 goodput이라고 해서 우리가 만족해야 하는, 초당 30개 token 이상 나와야 한다는 것을 만족할 수 있는 throughput, 그걸 만족하는 throughput이 올라가게 되는 겁니다. 이거는 굉장히 크게 올라가고요. 그래서 요즘은 다 이거를 굉장히 많이 쓰고 있습니다. 그래서 disaggregation 효과가 언제 크고 언제 작은가 보면, 효과가 크려면 입력이 길고 출력이 짧으면 prefill 비중이 커서 decode가 영향을 많이 받게 되는데 그때 쓸 수 있고요. 그다음에 SLO가 빡빡해서 굉장히 타이트하게 우리는 이것을 무조건 절대적으로 지켜야 한다, 이런 게 있으면 쓰면 좋고, 결국에는 고대역 interconnect가 있어야 되고, 규모가 큰 경우에는 요약하면 이렇게 되고요.
 
@@ -424,17 +551,27 @@ series: "main"
 
 ## Agentic AI가 만드는 새로운 inference workload    *1:23:33*
 
+
+![발표자료 52쪽: Agentic AI · 단위](/episodes/ep112/slide_52.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:23:33">1:23:33</span> **이진원** 그래서 이다음에는, 여기는 그냥 LLM을 우리가 챗봇처럼 쓰거나 혹은 reasoning 정도로 쓸 때의 얘기고, agentic AI, 저도 AI agent를 굉장히 많이 쓰고 있는데, agentic AI가 오면 조금 달라지는 얘기가 있어서 개념적으로만 이런 식으로 달라질 수 있겠구나. 그래서 요즘 AI agent의 workload를 분석한 논문들이 갑자기 많이 나오고 있어요. 최근에는 여기 아래 보시면, 8월에 Copilot의 26년 6월 한 달 동안의 trace를 다 분석해서 낸 논문도 있고, 그다음에 TraceLab이라고 하는 것도 있는데, 이런 논문들을 좀 참조했고요.
 
 <span class="paragraph-timestamp" data-ts="1:24:13">1:24:13</span> 용어를 좀 정리하기 위해서 session, request, 그다음에 step, 이렇게 보면 session은 뭐냐 하면, 우리가 AI agent를 시작해서 agent가 완전히 종료될 때까지를 session이라고 생각하시면 되고, request는 그 안에서 사람이 prompt를 주고 AI agent가 loop를 돌겠죠. LLM도 call하고 tool도 call하면서 loop를 돌아서 결과를 내놓을 때까지가 한 번의 request입니다. 그러면 그것을 사람이 다시 보고 feedback을 주고 다른 일을 또 시키겠죠. 그다음 일이 request인 거고요. 그래서 request의 시작은 항상 사람의 prompt로 시작한다는 것, 그다음에 request 안에서 LLM도 수행되고 또 tool도 수행되고, 이렇게 LLM이나 tool을 한 번 call하는 것을 step이라고 보시면 되고요.
 
 <span class="paragraph-timestamp" data-ts="1:24:59">1:24:59</span> 그래서 통계를 보니까 session은 평균 62.6분이고, request가 session 하나당 9.2개 정도 있고요. request 하나 안에는 step이 9번 정도 있어서, 대략 session 하나에 계산하면 100번 정도의 step이 들어간다고 보시면 될 것 같습니다. 당연하지만 실제로 LLM을 call하는 것의 대부분, 그러니까 90% 정도, 이 두 개의 빨간색 90%는 AI가 호출하더라. 그러니까 AI를 사람보다 AI가 더 많이 쓰는 거죠. 사람은 prompt를 넣어줬을 때 그때 한 번만 사람에 의해 LLM이 call되는 거고, agent가 loop를 도는 동안은 계속 agent가 LLM을 호출하니까요.
 
+
+![발표자료 53쪽: Agentic AI · 특징①](/episodes/ep112/slide_53.jpg)
+![발표자료 54쪽: Agentic AI · 특징③](/episodes/ep112/slide_54.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:25:40">1:25:40</span> 그리고 이게 굉장히 많은 interaction을 거치고, 중간에 reasoning하는 과정도 있고요. 우리가 챗봇으로 쓰다가 reasoning으로 가면서 생각하는 thinking token들을 굉장히 많이 내놓게 됐잖아요. 그래서 길이가 길어졌고, 그만큼 앞에서 얘기했던 KV cache 공간도 많아졌는데, 이제는 reasoning하는 LLM 호출이 이 agent의 아까 step 한 번에 들어가 버리는 거예요. 그러면 거기에 다시 몇 배가 되겠죠. 이 LLM이 수행될 때 보면 그 앞에 쌓여 있던 KV cache를 읽어오는 게 거의 대부분이고, 11만 9천 개의 token은 prefix에서, 그러니까 예전에 계산했던 KV cache를 읽어오는 거고, 새로 추가된 것은 875개고, 그로 인해 나오는 output token은 214개다. 100분의 1 수준이잖아요. 그래서 그 정도로 다시 읽어오는 게 굉장히 중요해졌다.
 
 <span class="paragraph-timestamp" data-ts="1:26:32">1:26:32</span> 그리고 또 중요한 게, 이 모든 workload가 heavy-tail입니다. 우리가 long-tail인데, 그 tail이 굉장히 영향을 많이 주는 heavy-tail인 거죠. 그래서 worst case를 무시하면 agent 서비스는 망합니다. 그래서 worst case를 항상 고려해야 되고, 이것을 잘 알 수 있는 게 중앙값과 평균의 skew가 거의 15배나 벌어질 정도예요. 평일 사용과 주말 사용 같은 것들도 분석해 놓은 게 있는데, 평일에는 당연히 사용량이 훨씬 많고요. session 같은 것의 개수가 많은데, 주말은 그 개수가 적은 대신, session당 iteration이 훨씬 많이 돕니다. 그래서 당연히 사람들이 더 복잡한 job을 주말에 돌려놓고 집에 가거나 하기 때문에 그럴 거라고 예상할 수 있고요.
 
 ## 사람이 만드는 대기 시간과 KV cache 골든타임    *1:27:22*
+
+
+![발표자료 55쪽: Agentic AI · 특징④](/episodes/ep112/slide_55.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:27:25">1:27:25</span> **이진원** 그 session 하나 안을 분석해 보면 request와 request 사이에 사람이 판단해서 AI가 내어 준 결과를 이해하고 다시 다음 요청을 보낼 때까지 시간이 있겠죠. 보통 저 같은 경우도 agent에게 일을 시켜놓고 다른 agent를 이용하거나 다른 일을 하다가 와 보면, 다 돼 있네 하고 확인하기 때문에 사람이 AI가 계속하는 것을 보고 있는 건 아니잖아요. 대부분 다른 일을 하다가 오니까 그 시간이 많이 낭비되고요. 그래서 session 전체의 약 92%를 사람이 잡고 있는 거고, tool이 call하는 건 4.8%, LLM은 3.3%여서 거의 1 대 1이라고 보면, 실제 얘네들이 쓰는 건 8%고 사람이 92%의 시간을 쓰더라. 사람이 병목이라는 얘기죠.
 
@@ -450,11 +587,20 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="1:29:46">1:29:46</span> **이진원** 그 논문에 따르면, 몇 분 후에 돌아올지를 예측하는 것은 좀 쉽지 않은데, 빨리 돌아올지 빨리 안 돌아올지는 그래도 예측이 잘되는 편이다.
 
+
+![발표자료 56쪽: Agentic AI · 특징⑤](/episodes/ep112/slide_56.jpg)
+
 <span class="paragraph-timestamp" data-ts="1:29:54">1:29:54</span> **노정석** agent workload는 compute-bound가 아니라 어마어마하게 다 memory-bound네요. bound라는 표현이 무색하게 그냥 memory work네요. 들고 있기 게임이네.
+
+
+![발표자료 57쪽: Agentic AI · 특징⑥](/episodes/ep112/slide_57.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:30:06">1:30:06</span> **이진원** 그래서 결국 다시 읽어오는 데도 비용이 많이 든다. 이것을 또 계산해 보면, 여기 cloud에서 서비스를 빌려 쓰는 것을 기준으로 계산해 보면, 60%가 prefix를 읽을 때 사용하는 비용이 된다. 그다음에 이것을 쫓아냈을 때, 그러면 이것을 아예 삭제한 다음에 다시 사용자가 돌아왔을 때 KV cache를 다시 계산할 수도 있잖아요. 아니면 CPU의 DRAM이나 혹은 storage에 보낸 다음, 그것을 다시 읽어오는 방법이 있을 거고요. 그 두 개를 비교했을 때 어떤 게 더 좋냐고 하면, 거의 대부분의 경우 멀리라도 갖다 놓았다가 읽어오는 게 좋다는 얘기입니다. 다시 계산하려면 시간도 오래 걸리고 비용도 많이 드는데, 이것을 읽어오는 것은 시간이 좀 걸리더라도 그보다는 훨씬 짧기 때문에 이게 더 유리해서 이쪽으로 많이 가고 있습니다.
 
 ## 재계산 대신 다시 읽어오는 KV cache와 계층형 메모리    *1:30:10*
+
+
+![발표자료 58쪽: Agentic AI · 설계](/episodes/ep112/slide_58.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:31:07">1:31:07</span> **이진원** 그리고 이것을 읽어오는 동안 어떤 연산을 할 수 있으면 이게 아예 가려질 수 있어서 더 좋다, 이런 얘기인 거고요. 이제 memory도 hierarchical하게 써야 되고, SRAM, HBM, DDR, SSD 혹은 high-bandwidth flash 같은 것도 요새 많이 얘기하고 있는데, 이런 것까지 다 역할을 잘 나눠서 KV cache의 중간 결과물들을 어떻게 scheduling해서 언제 어디로 보내고, 언제 다시 가져올지를 잘하는 게 agentic AI에서 새롭게 떠오르는 굉장히 중요한 것이다. 그러면 이것을 또 잘해주는 open-source, 아까 vLLM이나 SGLang 같은 소프트웨어들이 앞으로 많이 생겨나겠죠. 그래서 병목은 compute에 있다가 memory에 있다가 power가 됐다가 이렇게 계속 왔다 갔다 하는 거고, 그때마다 답이 달라지고, 사람들은 한쪽에 병목이 있으면 어떤 방법으로든 해결하려고 한다는 얘기를 오늘 드리고 싶었습니다.
 
@@ -471,6 +617,9 @@ series: "main"
 <span class="paragraph-timestamp" data-ts="1:33:20">1:33:20</span> **박종현** HyperAccel이라는 회사 입장에서 어떤 전망이나 미래 같은 것을 어떻게 바라보고 계신지 궁금합니다. 왜냐하면 HyperAccel도 컴퓨트, 메모리, 파워라는 모든 인프라에 필요한 새로운 칩을 만들고 계시고, 칩이랑 computing platform 자체를 만들고 계신 거니까요. 그런데 HyperAccel 말고도 당연히 엄청나게 많은 팀이 그런 것을 다 해결하려고 하고 있잖아요. 그러면 inference hardware라는 시장 자체가 앞으로 계속 커질 것이고, NVIDIA GPU가 지금 inference 시장에서도 가장 많이 쓰이고 있는데, 결국에는 Groq을 포함해서 Groq이든 Cerebras든 TPU든 여러 칩이 다 들어오게 되어서 많은 부분을 대체할 것 같아요. 최근에 들은 소식으로는 뭐였죠? GLM-5.3 Flash, 그것도 완전히 중국산 칩으로 inference했다고 제가 들었거든요. 그렇게 발표했던 것 같아요. 앞으로 그 시장은 어떤 식으로 지형이 변할 것 같으신지 궁금합니다.
 
 ## GPU와 LPU가 결합하는 heterogeneous computing의 미래    *1:34:21*
+
+
+![발표자료 63쪽: AI 반도체· Roofline](/episodes/ep112/slide_63.jpg)
 
 <span class="paragraph-timestamp" data-ts="1:34:24">1:34:24</span> **이진원** 굉장히 좋은 질문이고, NVIDIA가 Groq을 인수한 이유가 아까 roofline 그래프를 굉장히 다양한 AI 반도체와 GPU를 포함해서 하드웨어들의 그래프라고 했으니까 그려 본 건데요. 여기 제가 진하게 해 놓은 Vera Rubin이 이렇게 생겼고, Groq은 이렇게 생겼거든요. 아까 아래로 내려 보면 얘가 훨씬 더 bandwidth가 높다는 것을 위로 올라가 있으니까 알 수가 있겠죠. 그래서 아까 제가 prefill-decode disaggregation을 말씀드렸는데, 이 Vera Rubin 패밀리에서는 그걸 LPX라고 부르죠. LPX가 하는 역할은 disaggregation에서도 prefill은 다 Rubin GPU로 하고, decode도 다 Rubin GPU로 하되 attention까지는 하고, FFN만 Groq의 LPX를 가지고 하는 거거든요. 그런데 얘는 arithmetic intensity의 ridge point가 여기에는 8이라고 나와 있네요. 한 자릿수인 거죠. 그래서 이 파란색보다 이 빨간색 그래프가 위에 있는, arithmetic intensity가 상대적으로 그렇게 높지 않은 영역에서 Groq의 LPU가 이득이 있는 겁니다. 그래서 아까 InferenceX도 오른쪽에 그 영역이 배치되는 거고요.
 

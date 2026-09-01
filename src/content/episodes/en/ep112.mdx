@@ -76,6 +76,9 @@ series: "main"
 
 ## Value Capture Shifting to AI Infrastructure    *0:00*
 
+
+![Presentation slide 1: LLM INFERENCE](/episodes/ep112/slide_01.jpg)
+
 <span class="paragraph-timestamp" data-ts="0:00">0:00</span> **Chester Roh** Today, as we're recording, is August 30th, 2026, a Sunday morning. Today, we have HyperAccel CTO Jinwon Lee with us. There has been so much news lately, right? But if we arrange the news by category, from data centers at the bottom to chips and models, and then applications on top, there are various layers, and lately, what I’ve been noticing is that progress on the model side is happening so quickly that, as they call it, value capture— the areas that actually make money— is moving down toward infrastructure, and moving up toward applications, and we’ve been seeing these two trends. Today, we’re going to hear a very important lesson from our guest. It’s about this lower layer. We put power into building chips, load trained models onto them, and provide customers with an enormous amount of inference, after all. What is happening inside that, and what we need to understand to read the benchmarks within it—we previously covered inference with Seungjoon, armed with this shallow knowledge, while doing Dwarkesh’s roofline analysis, and talked about inference once, and since then, we’ve been discussing inference very frequently. The reason we talk about it so often is probably because it is so important. Today is the ultimate masterclass edition of that. If you carefully follow CTO Jinwon Lee’s lecture, you’ll be able to understand the various new benchmarks coming out of SemiAnalysis, the things NVIDIA announces, and the things chip companies announce as well. That’s why. Let’s invite CTO Jinwon Lee and hear from him. Welcome, CTO Lee.
 
 <span class="paragraph-timestamp" data-ts="1:48">1:48</span> **Jinwon Lee** Hello. Nice to meet you. It’s been a while since I last appeared.
@@ -89,19 +92,35 @@ series: "main"
 
 ## Perpetual Compute Shortages and Exploding Token Demand    *2:13*
 
+
+![Presentation slide 2: “ We used to talk for years at OpenAI about](/episodes/ep112/slide_02.jpg)
+
 <span class="paragraph-timestamp" data-ts="2:16">2:16</span> **Jinwon Lee** Shall we get started? What I’ll be discussing today is related to inference engineering. You all are probably using AI very extensively now, but on the GPUs mainly used or other AI semiconductors, what exactly is happening is difficult material, but I’ll explain it as simply as possible today. I’ll first talk about matters related to our company, and then we’ll begin in earnest. This is something Sam Altman said at the OpenAI Forum in April this year. If you look here, it says “compute crunch”: we live in a world where compute is severely lacking, and when will we be able to escape from that? This is something OpenAI people have discussed for years, but at this point, it seems that going forward, we may never escape it. In other words, we will always live in a world short of compute, is what he is saying. Whether for training or inference, we are in a situation where compute is insufficient.
 
 <span class="paragraph-timestamp" data-ts="3:24">3:24</span> Another thing that shows this well was announced at Google I/O in May: after examining token usage on GCP, Google announced that monthly usage had increased fiftyfold in twelve months. And last September, I went to the AI Infrastructure Summit, where Google also gave a presentation, saying that it had doubled again in just two months and become one hundred times larger in fourteen months. And what has happened now? It has increased significantly again since then, to roughly 330 times the level in 2024, and they continue to say that there is enormous explosive demand. As everyone knows, models are also continuing to grow. What is shown here includes unofficial estimates, and I recently heard that Fable 5 has around 8T parameters, as well, and for a while, models appeared not to be growing much, as if they were not getting bigger beyond several trillion parameters, but Mythos is rumored to have 10T parameters, so model scale is growing again as well.
+
+
+![Presentation slide 6: Demand](/episodes/ep112/slide_06.jpg)
+![Presentation slide 7: Infrastructure](/episodes/ep112/slide_07.jpg)
+![Presentation slide 8: Infrastructure · Korea](/episodes/ep112/slide_08.jpg)
+![Presentation slide 9: Infrastructure](/episodes/ep112/slide_09.jpg)
 
 <span class="paragraph-timestamp" data-ts="4:25">4:25</span> And to handle this, data centers are being built at an enormous scale worldwide. They’re called GW data centers, and if you look here, by 2030, about $6.7 trillion will be spent on data centers, which, in Korean won, comes to nearly 10 quadrillion won. And in Korea as well, there are currently four mega-projects, aiming to build 18.4 GW worth of data centers on Korean soil by 2035. As this happens, as everyone often says, electricity is the problem. Everyone is talking about how to supply power, and here, when data centers are built in the United States, until electricity is connected to them, it takes about five years on average. And when data center power applications are reviewed in Korea’s Seoul metropolitan area, more than half of them fail, according to reports that keep coming out. So power is a huge issue, and another thing that came up on the Dwarkesh podcast was that Anthropic has now been growing its revenue tenfold for three consecutive years, while these frontier labs are increasing compute, meaning computational capacity, by three times each year.
 
 
 ## Revenue–Compute Gaps Driving Up Inference Unit Costs    *5:17*
 
+
+![Presentation slide 10: Compute pricing](/episodes/ep112/slide_10.jpg)
+![Presentation slide 11: Compute pricing](/episodes/ep112/slide_11.jpg)
+
 <span class="paragraph-timestamp" data-ts="5:35">5:35</span> **Jinwon Lee** That means the gap widens by 3.3 times a year. So GPU compute increases threefold, while revenue grows tenfold. How should we interpret this gap? There are three ways to do so. First, during inference, they could raise margins to increase revenue. But Anthropic’s inference margin is already reportedly 70–80%, and if we assume the ceiling is 90%, there is hardly any room left to increase it. And second, if I have 100 GPUs, 100 units, and am currently using 70 of them for training and 30 for service, I could increase that ratio to 50–50 and raise the share of GPUs used for inference, which would generate revenue, so with the same compute, that would be a way to increase revenue. But it is currently known to be roughly 50–50, and many people say it would be difficult to increase this further. Because reducing the share used for training means putting less effort into model development, and these frontier labs right now are in a situation where survival is difficult. So it is difficult to raise this much as well. Then what remains is, ultimately, that the unit price of compute can only go up. So neocloud companies and companies like them are also making very strong profits, and for short-term rentals, you have to pay more than twice as much as for long-term rentals, so in this way, the actual unit price of compute is also rising significantly.
 
 
 ## HyperAccel Bertha Chip Choosing LPDDR over HBM    *7:17*
+
+
+![Presentation slide 12: HyperAccel](/episodes/ep112/slide_12.jpg)
 
 <span class="paragraph-timestamp" data-ts="7:20">7:20</span> **Jinwon Lee** So the reason I laid out this background first is that the chip we are making is called Bertha. This is our first, the first one made by our company: a data center-class AI chip. The distinguishing feature of our product is that, instead of using the HBM everyone uses, it uses low-power DDR memory called LPDDR. What we can gain from this is lower power consumption compared with chips that use HBM. And above all, HBM is very expensive and difficult to obtain, whereas we use DDR, so we can supply it at a very low cost. So we planned and developed a product that can dramatically reduce the cost of the AI services you use. It is currently manufactured using Samsung’s 4nm process, and this chip came out at the end of March this year, so we are now working hard on bring-up.
 
@@ -131,6 +150,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="11:38">11:38</span> **Jinwon Lee** Coincidentally, Groq, which NVIDIA acquired, also uses the name LPU, and we also use the name LPU, but we actually used the name LPU much earlier. Groq was originally called TSP, Tensor Streaming Processor, and later changed its name to LPU. But because Groq's LPU is better known, people often ask what an LPU is and whether it is another new kind of NPU, but it is just a name. Broadly speaking, they are all just types of NPU, and ours can operate independently. GPUs also come as PCIe card products, right? You can think of it as the same thing.
 
+
+![Presentation slide 13: AI semiconductors](/episodes/ep112/slide_13.jpg)
+
 <span class="paragraph-timestamp" data-ts="12:16">12:16</span> So, to share one recent piece of news, as I mentioned earlier, at a place called Hot Chips, OpenAI unveiled Jalapeño, a very interestingly named AI semiconductor—a proprietary AI semiconductor it developed itself. It also uses HBM4. Even for GPUs using HBM4, it is only with Rubin that NVIDIA is using HBM4. The current Blackwell series all uses HBM3E, so it uses the most advanced memory technology, and one distinctive aspect is that OpenAI's Jalapeño architecture and the architecture of our product called Bertha, which I introduced earlier, are very similar.
 
 <span class="paragraph-timestamp" data-ts="12:58">12:58</span> So when we went to Hot Chips to demonstrate it, many people came by and said, "You seem very similar to OpenAI's architecture," which we heard quite often. We felt that way a lot as well. To explain a little, there is HBM like this, and we also have DDR alongside it; the data coming from there is handled by the adjacent cores, which receive it directly and perform computations, and the computation results are shared among the cores within it like this, so our architecture and Jalapeño are very similar. I developed it in a completely different place at a different time, yet they could be this similar, which I find interesting.
@@ -152,6 +174,9 @@ series: "main"
 
 ## Prefill and Decode as the Two Stages of LLM Inference    *15:01*
 
+
+![Presentation slide 14: Structure of LLM inference](/episodes/ep112/slide_14.jpg)
+
 <span class="paragraph-timestamp" data-ts="15:01">15:01</span> **Jinwon Lee** Then, let us get started in earnest. First, let us briefly look at how LLM inference works. There is what we call a prompt, which the user provides. When that comes in as input, for example, if the user asks here, "Is tomato a fruit?" then this LLM operates and works hard to compute, then outputs the first token, "Yes." So, for convenience, let us call this four tokens. Treating one word as a token, when four tokens are provided as input, it computes those four tokens all at once up to the point of outputting the first next token, "Yes." We call this process prefill.
 
 <span class="paragraph-timestamp" data-ts="15:39">15:39</span> After that, it works autoregressively, continuing to run, and then when "Yes" comes in as input, the LLM runs another computation and outputs a token called "it," then "it" goes in and "is" comes out, and when "is" goes in, if what is called the end-of-sentence EOS token, indicating that the sentence has ended, comes out, this iteration ends. So, the part shown in red here, where one token comes in like this and one token comes out next, is called the decode phase. So, the process of LLM inference consists of prefill and decode, divided into these two stages.
@@ -164,10 +189,16 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="17:21">17:21</span> **Seungjoon Choi** I have a question as well. This also came up when Noah was here, but TTFT, or time to first token, is between the blue and red
 
+
+![Presentation slide 15: Structure](/episodes/ep112/slide_15.jpg)
+
 <span class="paragraph-timestamp" data-ts="17:27">17:27</span> **Jinwon Lee** That's right. The time from when this black input comes in to when "Yes" comes out is TTFT, time to first token. Then, when "Yes" goes in and "it" comes out, this one decode iteration is also called TBT, or time between tokens, and TPOT. It is also called time per output token, and there are several slightly different terms. Their meanings differ ever so slightly, but there is no major problem with using them interchangeably. Then, let's look at what exactly is inside an LLM iteration. There is an algorithm called Transformer in here, and to summarize it once more, the flow goes from top to bottom. When a token first comes in, these days positional embedding is also handled internally, and we use RoPE. That is inside attention, but in any case, when a token comes in, the important thing is the attention I've colored, followed by what is called a feed-forward network, or FFN, passing through it, and then repeating this over and over, before finally reaching what is called the LM head to select what the next token will be. But in this model, if we are talking about a 100B-parameter model, that model's parameters exist, and if we look at what proportion of those parameters are in attention and the feed-forward network, attention accounts for roughly 20%, while FFN accounts for about 80%. So, by about four to one, FFN has more parameters. But this is for dense models, when we are not using the kind of model frequently used these days called MoE. With MoE models, the proportion shifts much more heavily toward FFN. So, there are fewer parameters in attention than you might think. When we think of Transformers, we think attention is the core—and it is. But the most important computations in a Transformer can be considered these two.
 
 
 ## Attention and FFN as Transformer’s Core Operations    *17:57*
+
+
+![Presentation slide 16: Dimensions](/episodes/ep112/slide_16.jpg)
 
 <span class="paragraph-timestamp" data-ts="19:19">19:19</span> **Jinwon Lee** So, we will look at that in more detail, but before that, we need to examine the dimensions of what we feed into this Transformer as input and what comes out as output. We need to look at those dimensions. There are three dimensions. The first dimension is batch, which is the batch used when multiple requests come in and are processed simultaneously. Next is the number of tokens. So, when I asked earlier, "Is tomato a fruit?" there were four tokens. Those four tokens, and how many dimensions each token will be represented as a vector, make up the three-dimensional input, and the output is also three-dimensional, but as you saw earlier, in prefill, we do not know how many words or tokens of input a user will provide. It can be up to one million tokens. So, this becomes greater than 1, but because only one token comes out as the result, this becomes 1. So, if we remove this 1, it can effectively be considered two-dimensional. And in decode, one token always comes in and one token comes out, so when we do not consider the batch, data of the same form as the output of this prefill you can think of it as moving around.
 
@@ -175,12 +206,18 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="20:38">20:38</span> **Seungjoon Choi** That's right. This is a bit confusing. At first, this token is an ID, an integer or a natural number, but from this point on, it's a vector, right, here?
 
+
+![Presentation slide 17: Structure](/episodes/ep112/slide_17.jpg)
+
 <span class="paragraph-timestamp" data-ts="20:45">20:45</span> **Jinwon Lee** That's where it changes into a vector in the token dimension, where it was originally a scalar and becomes a vector. So if you look inside attention, there are things called Query, Key, and Value, and for each token that came in as input earlier, if the embedding dimension here is 10 dimensions, you represent one word with 10 numbers, or represent one token. You take that token embedding vector and use some weight parameters here, which are model parameters. You multiply each of them and perform matrix operations. That creates Query, Key, and Value. Then a question arises here: the input is three-dimensional, but this is two-dimensional. You may wonder how you multiply them, but simply put, you take B times S and just flatten it. For example, if B here is 5, the sequence is 2, and D is 10, you have 5 times 2 times 10, multiply the first two to get 10, make it into a 10-by-10 matrix, and then think of it as performing the operation. So you multiply this to generate QKV, and then perform operations among Query, Key, and Value. First, you take the dot product of Query and Key, perform matrix multiplication, and then apply something called softmax, then multiply Value again to perform the operation. This is called self-attention.
 
 
 ## QKV Operations and the Self-Attention Structure    *20:50*
 
 <span class="paragraph-timestamp" data-ts="22:08">22:08</span> **Jinwon Lee** But you divide this into multiple heads and perform the same operation, so here, you split up all the generated QKV and, if there are 16 heads, divide it into 16 pieces, perform self-attention among those pieces, and later combine them back into one, which is called head merge. So when merging, you concatenate all these results together and multiply them once more by some weight parameter here to produce the result. Then this result goes through several subsequent operations, such as residual connections, and moves on to the FFN. Broadly speaking, the FFN consists of two linear layers. You simply multiply by weights twice. Of course, something called a gate has recently been added, making it a little more complicated, but you can think of it as a neural net with two layers. So the point is that there are many parameters here for computation.
+
+
+![Presentation slide 18: Key distinction](/episodes/ep112/slide_18.jpg)
 
 <span class="paragraph-timestamp" data-ts="23:08">23:08</span> Conceptually, attention turns all of these into Query, Key, and Value, for example, and takes the Query of this one and the Key of these ones, this one's Key, and computes vector dot products with every Key. That is represented as matrix multiplication, so you can think of attention as learning the relationships between tokens, and when it goes into the FFN, earlier, I said one token could be represented by a certain number of numbers—say, 10, meaning it is represented as a 10-dimensional vector. The 10-dimensional vector consists of numbers, and the FFN performs operations among those numbers. So operations between tokens are attention, while operations among vector dimensions within one token are what you can think of as the FFN.
 
@@ -193,6 +230,9 @@ series: "main"
 <span class="paragraph-timestamp" data-ts="25:15">25:15</span> **Seungjoon Choi** It's not just that we don't need to know gates; we don't actually need to know all of this, right?
 
 <span class="paragraph-timestamp" data-ts="25:18">25:18</span> **Jinwon Lee** You can just think, "Oh, something like this exists."
+
+
+![Presentation slide 19: KV cache](/episodes/ep112/slide_19.jpg)
 
 <span class="paragraph-timestamp" data-ts="25:24">25:24</span> **Chester Roh** Yes, actually, this is one step. You need to understand this Transformer paper, how the dimensions inside it work, and even understand the PyTorch code line by line before Transformers naturally start to make sense after that, Before that, no matter how much you examine it conceptually, some things are difficult to understand. That is an unavoidable fact. So regarding that part, just knowing conceptually that there is an attention block, an FFN block, where computation is used heavily, and what these things are will be enough for you to follow the content that comes afterward.
 
@@ -207,6 +247,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="27:48">27:48</span> **Chester Roh** Right. This is what we always call the KV cache. If we brought in a news article from elsewhere earlier and prefilled 2,000 characters, then the KV cache contains all of those preceding 2,000 characters.
 
+
+![Presentation slide 20: KV cache](/episodes/ep112/slide_20.jpg)
+
 <span class="paragraph-timestamp" data-ts="28:00">28:00</span> **Jinwon Lee** We have to retrieve all of that. So the memory space for storing this KV cache needs to be large. So, to find out exactly how much storage is needed per token to store KV, if we calculate it, this uses the Llama 3.1 70B model. The 2 here is multiplied because there are two: Key and Value. So we multiply by 2. N is the number of layers. Since attention must be performed at every layer, it is needed for each layer, and then, for the Key and Value, as mentioned earlier,
 
 
@@ -216,7 +259,13 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="28:35">28:35</span> **Jinwon Lee** Multi-head attention is the default, in the transformer algorithm, but Llama 3.1 uses grouped-query attention. What is grouped-query attention? It is labeled GQA here, and for each head, originally there should be one Query, one Key, and one Value, but if, for example, eight heads are grouped together, there are eight Queries for every eight heads, but the Key and Value have only one each, one for every eight, that is how you can think of it. Then you multiply by the number of heads, and determine how many bytes to use to store each Key and Value. Usually, if they are stored in BF16 or FP16, they take 2 bytes. So, if you calculate all of this, it comes to roughly 320 KB, 320 KB per token. So, if we were to store this for a 128K, 128,000-token context as Keys and Values, about 40 GB of capacity is needed. A single H100 has 80 GB of memory, so that is half of it. If one user uses a 128K context, 40 GB of Key and Value storage is needed. And that is with a 70B model. If this goes to a 1T model, it will become enormous.
 
+
+![Presentation slide 21: Model comparison](/episodes/ep112/slide_21.jpg)
+
 <span class="paragraph-timestamp" data-ts="29:51">29:51</span> To show that the size of Key and Value storage is larger than you might think, I organized a table of various open-source models showing what attention they use, how much Key and Value capacity they require per token as a result, and how much capacity increases as the context grows. I organized it into a table. If you look here, among the models released recently, Chinese open-source models are a little smaller, as you can see. There are some different types of attention here. So, with this kind of attention, to compress the large amount of Key and Value data generated, various techniques are used to reduce it significantly. If it is not reduced, as you can see here, even compared with the capacity needed to store the model, the memory capacity needed to store Key and Value can become greater. So these kinds of things are happening.
+
+
+![Presentation slide 22: Serving scale](/episodes/ep112/slide_22.jpg)
 
 <span class="paragraph-timestamp" data-ts="30:45">30:45</span> And additionally, to run this, how many GPUs are needed, if the batch is 32—that is, serving 32 people— and the context averages 128K, how much is needed, I’ve listed the required number of GPUs here. In the case of something like an H100, to serve Llama 3.1 405B, 27 are needed. That is only divided by storage capacity, but since in practice you have to use multiples of eight, you would need around 32.
 
@@ -225,6 +274,9 @@ series: "main"
 <span class="paragraph-timestamp" data-ts="31:36">31:36</span> **Jinwon Lee** Right. If you think about even that,
 
 <span class="paragraph-timestamp" data-ts="31:41">31:41</span> Exhausting. Leave those things to the engineers who do inference engineering, and use it comfortably.
+
+
+![Presentation slide 23: Capacity measures](/episodes/ep112/slide_23.jpg)
 
 <span class="paragraph-timestamp" data-ts="31:48">31:48</span> **Jonghyun Park** That’s why frontier models, in their pricing plans, instead of subscriptions, if you pay to use the API, they tell you how long they retain that cache, and if the prompt I was using gets a cache hit, is the price about one-tenth? They give you a huge discount. It is a pricing policy made possible by retaining all that KV cache. Regular users do not need to worry about it; they can just assume the cache is all being retained.
 
@@ -237,6 +289,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="33:33">33:33</span> Next, since there is not enough space to store KV, systems like Mooncake move it to CPU memory or offload it to an SSD, then bring it back when needed and use it— that approach is discussed a lot. As agentic AI has emerged, the amount of KV being generated is now, compared with earlier reasoning models, at a level that cannot even be compared, so there is no way to keep it all in memory, and as I’ll mention later, people set it running, go do something else, and because the agent takes a long time, come back and say, “It’s all done.” During that period, the server cannot keep storing KV in expensive HBM memory, so methods that move it to other memory like this are also widely used.
 
+
+![Presentation slide 24: The physics of performance](/episodes/ep112/slide_24.jpg)
+
 <span class="paragraph-timestamp" data-ts="34:25">34:25</span> **Seungjoon Choi** When using an inference-specific chip, even if architectures that handle KV in this way keep changing, can already fabricated semiconductors handle it all?
 
 <span class="paragraph-timestamp" data-ts="34:37">34:37</span> **Jinwon Lee** That can vary depending on the situation. So usually, it is quite possible that it was not taken into consideration. Because in the past, people likely did not think much that space would become this abundant. But newly emerging ones are being designed with considerable consideration for using such things. Next, moving beyond the discussion of capacity, whether it is a CPU or GPU, which is why I called it an XPU, what determines XPU performance is, simply put, two things. When adding A and B in some computation, both A and B are initially in memory. So after reading A and reading B, adding the results and calling that C, and then storing that C back in memory, if there is such a simple operation, there is the need to read data from memory and then the need to perform computation, and depending on which of these two is faster, performance encounters a bottleneck on one side. The reason is that the example I just gave reads A and B, performs the computation, and stores the result in memory, which I explained as a serialized operation, In reality, it doesn't work like this; it reads A and B, and while it is adding A and B, it is also reading C and D for the next operation. That way, as soon as this operation finishes, it can add the next C and D as well. In AI, processing has to be done in parallel, and because the same operation has to be performed an enormous number of times, this naturally happens. Whether it's a GPU or an NPU, how many operations they can perform per second, and how quickly they can supply data from memory, these two factors determine where bottlenecks occur.
@@ -244,21 +299,36 @@ series: "main"
 
 ## Distinguishing Compute Bottlenecks from Memory Bottlenecks    *35:01*
 
+
+![Presentation slide 25: Ridge point](/episodes/ep112/slide_25.jpg)
+
 <span class="paragraph-timestamp" data-ts="36:22">36:22</span> **Jinwon Lee** Usually, compared to the data being read, they are designed to perform far more computations. For example, if you look at something like the H100, based on BF16, or 16-bit data, it can perform about 1 PFLOP/s of computation. That's about 1,000 TFLOP/s, while what it reads from memory is 3.35 TB per second. Then, if this is actually BF16, the number of data elements would be half that amount. Because each data element is 2 bytes. So if you roughly calculate this ratio, simply dividing gives you 300. So the point at which the two are exactly balanced, where neither computation nor memory is slower or faster, if you calculate the point at which they are balanced, it is roughly 300. This is called the ridge point. For example, suppose this is a hardware metric, and I run a certain AI model, and the program called a kernel that runs that model reads data from memory once, but can perform only 200 operations. Then the bottleneck will be on the memory side, whereas this model, when it reads data once, can perform 1,000 operations. Then it reads the data once and tries to perform 1,000 operations, but it can currently perform only 300 operations. So even though it could run faster, there are not enough compute units. In this case, it becomes compute-bound.
 
 
 ## Definition of Arithmetic Intensity and Data Reuse    *37:48*
 
+
+![Presentation slide 26: Arithmetic Intensity](/episodes/ep112/slide_26.jpg)
+
 <span class="paragraph-timestamp" data-ts="37:51">37:51</span> **Jinwon Lee** So this AI does not mean Artificial Intelligence, but Arithmetic Intensity, or arithmetic intensity, when reading 1 byte of data from memory, refers to how many operations can be performed on it. This may be a somewhat difficult concept, but I'll explain it with an example. Earlier, the four tokens from the question, “Is a tomato a fruit?” were represented as four-dimensional vectors. You would multiply them by some weight and perform many such operations. You would perform these operations when generating a query as well, and you would also perform them in the FFN, although the matrix sizes would differ somewhat. To explain it simply, I represented it as a 4×4 matrix. Then, from the perspective of this weight parameter, if you look at how many times this W11 is used in multiplication, it would be used four times. It would be multiplied by this as well, and by that as well, so this data, W11, when you read one of it, if you ask how many operations you can perform at most, you can perform four. That is Arithmetic Intensity. More precisely, in AI semiconductors or GPUs, every multiplication is followed by one addition. Because here, this vector and this vector are being multiplied in a dot product, you have to add up all these results. Multiplication and addition always occur together as a pair, so they are counted as two operations, but whether it is one or two is not important; the order is what matters here.
 
 <span class="paragraph-timestamp" data-ts="39:20">39:20</span> Ultimately, if you look at what this Arithmetic Intensity is affected by, it is affected by the number of tokens. And as I said at the very beginning, this number of tokens is originally three-dimensional in the input, but when entering as input, batch times token sequence length are combined into one. So if data from other batches are also stacked below, that is included as well. So it would have an Arithmetic Intensity equal to batch times sequence length. For example, let's simply assume the batch is 1, and suppose you use one million tokens. Then the Arithmetic Intensity becomes one million. Conversely, when it comes to decoding, this is just one. So what is called W11 is used only once. So at that point, the Arithmetic Intensity is 1. And this thing called Arithmetic Intensity is a slightly different topic, but it is extremely important in semiconductors. Because reading data once from memory and performing many operations means making extensive use of it. Conversely, for the same amount of computation, it means the number of memory reads decreases.
+
+
+![Presentation slide 27: Arithmetic Intensity](/episodes/ep112/slide_27.jpg)
 
 <span class="paragraph-timestamp" data-ts="40:23">40:23</span> The reason this is important is that, if you look here, compared to the energy consumed by one multiplication and one addition, this SRAM is memory that is even inside the chip, but when reading from SRAM, HBM, or DDR, if you look at the energy consumed, how many orders of magnitude apart are they? They differ enormously—by as much as four or five orders of magnitude. Because they consume so much energy, when we talk about low power, the most important thing is how little data we read from and write to memory, This is extremely important. And that is also connected to Arithmetic Intensity. That was a slightly different topic. So, Roofline analysis emerged, and it is a well-known paper published by several people, including David Patterson, in 2009. What I referred to earlier as the ridge point is a line that is drawn once the hardware is determined. It is not a line related to any particular model, but rather a graph that represents the performance of the hardware. This ridge point is a state with no bottleneck in either compute or memory.
 
 
 ## Reading Compute-Bound and Memory-Bound Through Roofline Analysis    *40:58*
 
+
+![Presentation slide 28: Roofline](/episodes/ep112/slide_28.jpg)
+
 <span class="paragraph-timestamp" data-ts="41:29">41:29</span> **Jinwon Lee** The way to draw this is, this flat line here represents the maximum computing capability a semiconductor can deliver. Earlier, I said that an H100 can perform about 1PFLOPS of computation, and that is this point here. If you follow the y-axis here, you get about 1,000 TFLOPS on the y-axis. Then, this slope has a slope of 1 when plotted on a log-log scale, and the point corresponding to the y-intercept, where it meets the y-axis, is the bandwidth. Because this slope is always 1, as bandwidth increases, this slope will rise. Then the ridge point will move to the left. Because data is supplied faster, the ridge point forms at a point with lower arithmetic intensity. Conversely, if bandwidth stays the same and compute increases, this horizontal line moves upward, so it goes up like this.
+
+
+![Presentation slide 29: Roofline](/episodes/ep112/slide_29.jpg)
 
 <span class="paragraph-timestamp" data-ts="42:26">42:26</span> So, what can we learn from this graph? If it is to the right of the ridge point, it is compute-bound. The x-axis is arithmetic intensity. When running a model, as I mentioned earlier, you load the weights during prefill, and can perform one million operations with these weights. Then, since this point is 295, one million would be far to the right. In other words, you can read the data once and perform one million operations, but the compute unit can only perform 300 operations at a time. So it has to perform this multiple times in batches of 300 and wait until it reaches one million operations, which is why it is compute-bound. Conversely, if you move to the left, during decode, you read data from memory and can perform only one operation. But the data from memory arrives at one three-hundredth the speed. So, by that much, performance drops dramatically.
 
@@ -267,7 +337,14 @@ series: "main"
 
 ## Improving Decode Efficiency with Batching and the Limits of Attention    *43:46*
 
+
+![Presentation slide 30: Batching](/episodes/ep112/slide_30.jpg)
+![Presentation slide 31: The exception of attention](/episodes/ep112/slide_31.jpg)
+
 <span class="paragraph-timestamp" data-ts="44:27">44:27</span> **Jinwon Lee** But a very serious problem arises here: even if you increase batching in attention, arithmetic intensity does not increase. The reason is, the key-value for my question and that for another person's question are different. So when you multiply query and key, the query is a vector and the key is a matrix, but you cannot share that matrix. When generating queries, keys, or values across batches, you multiply by the same weights, so you could gather tokens from different users and compute them together, but if this is the query for my output token, and this is the collection of key-values, another user cannot use these key-values. So this is a place where you can never increase arithmetic intensity. It has to remain at 1 here. So attention creates many bottlenecks. Especially recently, as context length has increased, this part has become a very large bottleneck.
+
+
+![Presentation slide 32: Attention measures](/episodes/ep112/slide_32.jpg)
 
 <span class="paragraph-timestamp" data-ts="45:27">45:27</span> So people would not just sit still. The idea is to increase arithmetic intensity in attention as well. If you use something like the GQA mentioned earlier, there is one key-value for every eight, so you gather eight queries and multiply them by the key matrix, giving you arithmetic intensity of 8. It increases from the original 1 to 8. MQA is also called multi-query attention, and if there are 16 queries, then across all 16 of them, only one key and one value are used. MLA is the same, except MLA compresses even those keys and values. So in such cases, depending on how many queries are assigned one key-value pair, arithmetic intensity increases accordingly. Next, when we give a prompt to ChatGPT or Claude, we cannot see it, but before it, there is a system prompt, information about various tools, and things like precautions included. The part that comes before it is always the same, so the key-values for the hidden prompt are calculated in advance, and sharing and using them is the prefix caching method. This gives us some benefit in that part. And if we reduce the size of the key-values themselves, with the same bandwidth, we can read in more key-values, so that would also be effective. So one method we use is to quantize key-values to 8-bit or 4-bit before bringing them in, and these kinds of techniques are also used in attention as a way to increase arithmetic intensity.
 
@@ -279,7 +356,13 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="48:50">48:50</span> And before moving on, let me offer everyone some reassurance once again: It's okay if these things do not immediately stick in your mind. You do not need to understand all of this, as long as you take it as the framework of thinking that arises to interpret these things within the economics of inference, and as the frontier of engineering. That's enough.
 
+
+![Presentation slide 33: Owner of the traffic](/episodes/ep112/slide_33.jpg)
+
 <span class="paragraph-timestamp" data-ts="49:19">49:19</span> **Jinwon Lee** So the next thing to discuss is, for example, if we apply some kind of quantization to use memory space a bit more efficiently and, with the same bandwidth, want to read more data, then to see what is effective to quantize, it inevitably relates to which data has a larger volume. We have to go back to the earlier discussion of capacity, and this too, earlier, for Llama 3.1 70B, using BF16 as the basis, the weights are roughly 141 GB, that is about how much the weights occupy, but the point at which key-values become larger is when we use 431,000 tokens. At that point, the key-values become larger. This is based on batch size 1. As the batch size increases, batch multiplied by sequence length corresponds to the arithmetic intensity mentioned earlier, and key-values are generated accordingly, so as the batch size increases, naturally, the amount of key-values reaches a point where it surpasses the amount of weights with fewer and fewer tokens.
+
+
+![Presentation slide 34: Owner of the traffic](/episodes/ep112/slide_34.jpg)
 
 <span class="paragraph-timestamp" data-ts="50:24">50:24</span> And this calculates how large the key-values are at 128K, and as you can see, at a batch size of 512, it is about 22 TB. So in practice, serving 512 people simultaneously on one server or one or two servers is impossible, as you can see here. So this is meant to show that the amount is large.
 
@@ -288,9 +371,15 @@ series: "main"
 
 ## The Trade-Off Between Interactivity and Throughput    *51:33*
 
+
+![Presentation slide 35: InferenceX](/episodes/ep112/slide_35.jpg)
+
 <span class="paragraph-timestamp" data-ts="51:33">51:33</span> **Jinwon Lee** That's right. And I'd like to talk a bit about benchmarks. So which AI semiconductor, or which GPU, is actually good? We also hear that question a lot: “How good is yours?” But it is very difficult to boil this down to a single number and say, “We're this many percent better than anyone else.” It is very difficult to put it that way. That is because the conditions are so diverse. So a representative metric is how quickly a single user receives tokens, tokens per second per user. How many tokens are delivered per second— that is called interactivity. And from the server's perspective, I am serving multiple people right now, so the sum of all the tokens being served to those people, divided by the number of GPUs— how many tokens per second each GPU is generating, regardless of whether they are going to one user or 100 users, adding them all together— is called throughput.
 
 <span class="paragraph-timestamp" data-ts="52:34">52:34</span> Even this morning, when I was going to record this, I was hungry on my way to the office, so I went to McDonald's and ordered a McMorning, and even though I could see them making it inside, it did not come out even after I waited quite a while. When I looked, they were putting down buns for several people's orders one by one, bam bam bam. That increases throughput, and I was the first person to order. So my interactivity ended up being in a very bad state. So what I want to say now is that when you increase throughput, you inevitably have to sacrifice interactivity to some extent, and when I happened to see that this morning, it immediately made me think of this.
+
+
+![Presentation slide 36: InferenceX](/episodes/ep112/slide_36.jpg)
 
 <span class="paragraph-timestamp" data-ts="53:14">53:14</span> **Jonghyun Park** I think this was the point mentioned in the previous episode with CEO Noah, that in order to keep increasing the token speed for one person, you have to sacrifice something else.
 
@@ -299,7 +388,14 @@ series: "main"
 
 ## How to Read the SemiAnalysis InferenceX Pareto Curve    *54:26*
 
+
+![Presentation slide 37: InferenceX](/episodes/ep112/slide_37.jpg)
+![Presentation slide 38: InferenceX](/episodes/ep112/slide_38.jpg)
+
 <span class="paragraph-timestamp" data-ts="54:57">54:57</span> **Jinwon Lee** If you think about this intuitively, I said earlier that as the number of users increases, the KV cache keeps growing by that amount. So when serving only one user, you only need to read that one user's KV cache, but if you serve 10 users, you also have to read 10 times as much KV cache data, then perform attention with it for all 10 users before moving on to the next layer, and if there are 100 layers, you have to repeat that 100 times, because reading the KV cache takes longer as the number of users increases. And I said the KV cache is large. Because of that, a single user inevitably experiences slower speed. So that is the conceptual way to think about it. If I show you the actual graph, it looks like this. On the right, you can see the various GPUs, NVIDIA and AMD GPUs. The ones on the left have high throughput, and user interactivity is low, and you can think of the right side as being fast.
+
+
+![Presentation slide 39: 41](/episodes/ep112/slide_39.jpg)
 
 <span class="paragraph-timestamp" data-ts="55:52">55:52</span> **Seungjoon Choi** When we drew the Pareto frontier graph earlier, were we assuming a single GPU, whereas here we are using multiple GPUs?
 
@@ -323,6 +419,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="58:12">58:12</span> **Jinwon Lee** That is actually included in a single configuration within this point. Something called disaggregation, which I will discuss later, also makes a huge difference depending on whether you use it or not.
 
+
+![Presentation slide 40: InferenceX](/episodes/ep112/slide_40.jpg)
+
 <span class="paragraph-timestamp" data-ts="58:21">58:21</span> **Jonghyun Park** Once the user's required token count and interactivity are defined, when I buy a particular GPU, I can see how much throughput it delivers, meet demand, and calculate how much I could earn or how long it would take to recoup the investment; I think this could be sufficiently useful for modeling as well.
 
 <span class="paragraph-timestamp" data-ts="58:34">58:34</span> **Chester Roh** That is exactly why SemiAnalysis does this, I suppose. So, for example, ChatGPT or Anthropic buys certain machines and builds a certain cloud, then charges users a certain amount, and whether they are making money or losing money— by looking at this graph, you could roughly work all of that out in reverse.
@@ -340,6 +439,9 @@ series: "main"
 <span class="paragraph-timestamp" data-ts="59:57">59:57</span> **Chester Roh** The company is already enormously profitable. It has never taken investment, and these reports, on what the economics of frontier labs look like, and what kind of curve these companies will reach within two or three years relative to their investment, are being sold as reports to companies around the world, and there are a great many people who want to know. We are curious about it ourselves, so wouldn't these enormous corporations be even more curious? So I understand that they are gladly paying a great deal of money for it.
 
 <span class="paragraph-timestamp" data-ts="60:26">60:26</span> **Jinwon Lee** When we went to ICML at the time, we met with them once, and after that, we also had several meetings online.
+
+
+![Presentation slide 41: vLLM](/episodes/ep112/slide_41.jpg)
 
 <span class="paragraph-timestamp" data-ts="60:35">60:35</span> **Chester Roh** AI Frontier and SemiAnalysis held a party during ICML last July. At Lablup. At that time, many chip companies in Korea and large corporations, and SemiAnalysis, we once arranged an exchange between them.
 
@@ -362,6 +464,9 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="65:00">65:00</span> **Chester Roh** Exactly. Right, it is optimization. How do you reduce buses leaving empty and send them off packed full of people? The McDonald’s hamburger example, the express bus terminal bus example, and the KTX passenger example— they are all the same optimization problem.
 
+
+![Presentation slide 42: vLLM](/episodes/ep112/slide_42.jpg)
+
 <span class="paragraph-timestamp" data-ts="65:15">65:15</span> **Jinwon Lee** Next, there is something called PagedAttention, and what this is, is that we said earlier that we cache KV. Then we need to store KV in memory, but with ChatGPT, Claude, or Gemini, we do not know how many tokens or words they will use in their response. If we knew how many words they would answer with, we would know that that much KV would be produced and allocate that much memory in advance, Because we don't know that, the amount I can generate worst case, when I generate the maximum amount, when I give the longest possible answer, is what I have to use as the basis for allocating memory space. Until that request is finished. Then, in reality, the memory, as you mentioned earlier, for people who just have short conversations like "Hello," will end after just a few words, a few tokens, so all that remaining space would be wasted. So, the idea for reducing that waste, is also very simple: dynamically allocate memory. You bring in the concept of a page table. For example, if the first output word is the word Alan, to store the key and value for the word Alan, you allocate memory space in actual physical memory to block number 7. But since this space is a page, for example, it can store up to four words. If Alan comes first, you store the key and value here, and then if Turing comes next, there is an empty slot beside it, so you keep storing them. After storing them until a comes out, if the word computer comes out, the page is full, right? Then you allocate a new page at that point. So block number 0 here is now linked to physical block number 7. Block number 1 here is linked to actual physical block number 1, and block number 2 is linked to number 3, but this filled slot currently has one slot occupied. So it tells you the information that there are still three empty slots. So, dynamically like this, if you allocate a new page in memory as needed, you can use only exactly as much memory as you need, making memory use efficient, so you can provide services to more users. That is the concept.
 
 <span class="paragraph-timestamp" data-ts="67:32">67:32</span> But while this also seems like a good idea, it is not simple either, because in the worst case, although it is very rare, if everyone, in the worst case, produces maximum-length output, a problem arises. Because this is kind of like this: since people do not withdraw their deposits from a bank, the bank keeps a low reserve ratio, whereas normally, assuming the worst case, it should reserve all that memory space and serve only that much, but since not everyone will use that much anyway, it accepts additional users. But then, if all users produce the maximum output, memory space will run short. Then you have to evict this KV, and load it back in later, so it is not very simple from a software perspective. But in most cases, that does not happen very often, so it can be used effectively.
@@ -374,16 +479,25 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="69:24">69:24</span> **Chester Roh** They imitate one another, so now they have all become the same.
 
+
+![Presentation slide 43: vLLM](/episodes/ep112/slide_43.jpg)
+
 <span class="paragraph-timestamp" data-ts="69:28">69:28</span> **Jinwon Lee** And prefix caching also is shared no matter what request comes in, so you calculate the KV in advance, store it, and simply retrieve and use it.
 
 
 ## Chunked Prefill and Speculative Decoding    *69:37*
+
+
+![Presentation slide 44: vLLM](/episodes/ep112/slide_44.jpg)
 
 <span class="paragraph-timestamp" data-ts="69:37">69:37</span> **Jinwon Lee** Then there is something called chunked prefill. If prefill cuts in midway, it can slow down decoding because of this. Something that could have been done quickly if this were not there, can be slowed down when, because of this, a prefill of 8,192 tokens comes in all at once. If you group these four together and put them on the bus, they are slowed down because of this. Since the ridge point earlier was only 300, to process this much, you have to run a great many iterations, and by that amount, these become slower compared with when this is not there.
 
 <span class="paragraph-timestamp" data-ts="70:15">70:15</span> So what you do about this is, you simply cut everything into the same size. This really is the bus concept: you cut it up and put this prefill in divided pieces as well. And there is a priority order when doing this chunked prefill, and in most cases, decoding is always given priority. If there is decoding, you put decoding on first. Onto the bus. Then, among the prefill requests that were cut up, the earlier prefill has gone, but the prefills that couldn't get on the bus, and finally, the newly arrived ones— if there is still room, the newly arrived ones are accommodated as well. There is a priority order like that. That way, service quality can be satisfied best, so that is usually how it is done.
 
 <span class="paragraph-timestamp" data-ts="70:55">70:55</span> So, as shown here, it lowers TBT, and TBT is related to decoding. At first, this AI model starts answering and is answering well, but then suddenly stops in the middle— that situation happens because of this, so the idea is to reduce that and instead sacrifice a little of the time until the first token of prefill comes out. This is necessary to keep quality consistent, so this method is widely used.
+
+
+![Presentation slide 45: vLLM](/episodes/ep112/slide_45.jpg)
 
 <span class="paragraph-timestamp" data-ts="71:22">71:22</span> Lastly, there is speculative decoding, which Noah also talked about a lot last time. DeepSeek introduced a good method called DSpark, which greatly increases speed. The idea behind this is also very simple. In an autoregressive decode step, we generate one token at a time. The question is whether we could generate multiple tokens at once instead.
 
@@ -424,11 +538,24 @@ series: "main"
 
 ## PD Disaggregation Separating Prefill and Decode Pools    *78:53*
 
+
+![Presentation slide 47: Disaggregation · Why](/episodes/ep112/slide_47.jpg)
+
 <span class="paragraph-timestamp" data-ts="78:53">78:53</span> **Jinwon Lee** Let's move on. I would like to talk a little about disaggregation. But we have kept saying that prefill and decode are very different, and that arithmetic intensity is affected by sequence length times batch size, while decode, excluding attention, is affected only by batch size. That is how we understand it. So we could see that they are very far apart on the roofline. So as I mentioned earlier, even if you do chunked prefill, whenever prefill comes in, decode has a different nature, so a lot of prefill affects decode, while if you prioritize only decode, prefill's TTFT gets worse. So the simple idea was to split them up. That way, we can meet the required SLO with throughput—what we call goodput— and increase goodput.
+
+
+![Presentation slide 48: Disaggregation · Interference](/episodes/ep112/slide_48.jpg)
+![Presentation slide 49: Disaggregation · Effects](/episodes/ep112/slide_49.jpg)
 
 <span class="paragraph-timestamp" data-ts="79:42">79:42</span> So you set up a prefill pool and a decode pool and split them up. Jensen Huang often talks about a Token Factory. I think that includes this aspect as well: it may mean generating many tokens, but more than that, it is like making cars on a conveyor belt, where one person assembles the wheels and another person installs the doors. For each individual stage, you create a pool that does only that one thing. So you separate a prefill pool that only does prefill and a decode pool that only does decode, and call this PD, prefill-decode disaggregation. Then, all the key-values created in this prefill have to be sent to the decode pool. So when you do disaggregation, the network speed between them is also extremely important. Unless this is at a certain scale, there is not much benefit. The benefit comes when there is scale.
 
+
+![Presentation slide 50: Disaggregation · Effects](/episodes/ep112/slide_50.jpg)
+
 <span class="paragraph-timestamp" data-ts="80:39">80:39</span> So, as I mentioned earlier, in terms of raw throughput—that is, how many tokens are generated— it does not increase. The utilization is the same. They are all running at 100%. Even if you use the same GPUs, typically, at first, in a paper from Microsoft called Splitwise, disaggregation was discussed for the first time, and as you can see here, they use the same H100 GPUs but vary the number of prefill instances. Anyway, they vary the number to match the throughput, but there is a benefit only when it reaches a certain scale. Then, if everything is running at 100%, if you have 100 GPUs and split them at some ratio, and all 100 are running, the number of tokens generated will all be the same, because the required amount of computation is fixed.
+
+
+![Presentation slide 51: Disaggregation · Decision](/episodes/ep112/slide_51.jpg)
 
 <span class="paragraph-timestamp" data-ts="81:24">81:24</span> But what improves is called goodput: the throughput that lets us meet the requirement of generating at least 30 tokens per second, the throughput that satisfies that requirement increases. This increases very significantly. So these days, this is used very widely. So, looking at when the effect of disaggregation is large and when it is small, for the effect to be large, when inputs are long and outputs are short, the prefill portion is large, so decode is heavily affected, and that is when it can be used. Also, when the SLO is very strict and tight, and there is something like, “We must absolutely meet this,” it is good to use it, and ultimately, you need a high-bandwidth interconnect, so that is the summary for large-scale cases.
 
@@ -441,11 +568,18 @@ series: "main"
 
 ## New Inference Workloads Created by Agentic AI    *83:33*
 
+
+![Presentation slide 52: Agentic AI · Unit](/episodes/ep112/slide_52.jpg)
+
 <span class="paragraph-timestamp" data-ts="83:33">83:33</span> **Jinwon Lee** So next, this part is about when we use LLMs simply as chatbots or for reasoning to that extent, but with agentic AI— I also use AI agents very extensively— things change a little when agentic AI arrives, so conceptually, things may change like this. So these days, papers analyzing the workloads of AI agents are suddenly coming out in large numbers. Recently, as you can see below, there is also a paper published in August that analyzed all of Copilot's traces from the single month of June 2026, and there is also something called TraceLab, and so on. I referred to these papers.
 
 <span class="paragraph-timestamp" data-ts="84:13">84:13</span> To organize the terminology, if we look at session, request, and step, a session is when we start an AI agent until the agent completely finishes; you can think of that as a session. Within that, a person gives a prompt for a request, and the AI agent runs a loop. It runs a loop, calling the LLM and calling tools, until it produces a result—that is one request. Then the person looks at it again and gives feedback and assigns another task. That next task is another request. So the beginning of a request always starts with a human prompt, and within a request, the LLM runs and tools run as well, and each time an LLM or tool is called, you can think of that as a step.
 
 <span class="paragraph-timestamp" data-ts="84:59">84:59</span> So, looking at the statistics, a session averages 62.6 minutes, and there are about 9.2 requests per session. Within each request, there are about nine steps, so, roughly speaking, if you calculate it for one session, you can think of it as containing about 100 steps. Naturally, of the actual LLM calls, most of them—about 90%— these two red 90% figures show that AI made the calls. In other words, AI uses AI more than humans do. When a person enters a prompt, the LLM is called by a person only once at that point, but while the agent is running its loop, the agent keeps calling the LLM.
+
+
+![Presentation slide 53: Agentic AI · Characteristic ①](/episodes/ep112/slide_53.jpg)
+![Presentation slide 54: Agentic AI · Characteristic ③](/episodes/ep112/slide_54.jpg)
 
 <span class="paragraph-timestamp" data-ts="85:40">85:40</span> And this goes through an enormous number of interactions, and there is also a reasoning process in between. As we moved from using it as a chatbot to reasoning, we started generating a huge number of thinking tokens. So the length got longer, and accordingly, as we discussed earlier, the KV cache space also grew, but now, an LLM call that performs reasoning gets included in each step of this agent. Then it will multiply several times over again. When you look at this LLM running, reading the KV cache that had accumulated beforehand accounts for almost all of it, and 119,000 tokens come from the prefix—that is, from reading the KV cache calculated earlier, while 875 are newly added, and the resulting output tokens are 214. That's about one hundredth of the amount. So to that extent, rereading has become extremely important.
 
@@ -453,6 +587,9 @@ series: "main"
 
 
 ## Human-Created Latency and the KV Cache Golden Window    *87:22*
+
+
+![Presentation slide 55: Agentic AI · Characteristic ④](/episodes/ep112/slide_55.jpg)
 
 <span class="paragraph-timestamp" data-ts="87:25">87:25</span> **Jinwon Lee** between one request and the next, a person has to decide, understand the result produced by the AI, and then send the next request, so there is time. Usually, in my case too, I assign work to an agent, use another agent or do something else, and when I come back, I check it thinking, “Oh, it’s all done,” so people are not watching the AI continuously work. Most of the time, they come back after doing something else, so a lot of that time is wasted. So people occupy about 92% of the entire session, while tool calls take 4.8% and LLMs take 3.3%, so if you view it as almost one-to-one, these actually use 8%, while people use 92% of the time. That means people are the bottleneck.
 
@@ -468,12 +605,21 @@ series: "main"
 
 <span class="paragraph-timestamp" data-ts="89:46">89:46</span> **Jinwon Lee** According to that paper, predicting how many minutes later someone will return is somewhat difficult, but whether they will return soon or not return soon is still predicted fairly well.
 
+
+![Presentation slide 56: Agentic AI · Characteristic ⑤](/episodes/ep112/slide_56.jpg)
+
 <span class="paragraph-timestamp" data-ts="89:54">89:54</span> **Chester Roh** Agent workloads are not compute-bound; they are overwhelmingly memory-bound. Calling them bound almost feels beside the point—they are simply memory work. It is a game of holding things.
+
+
+![Presentation slide 57: Agentic AI · Characteristic ⑥](/episodes/ep112/slide_57.jpg)
 
 <span class="paragraph-timestamp" data-ts="90:06">90:06</span> **Jinwon Lee** So in the end, rereading it also costs a lot. If you calculate this as well, based on renting services in the cloud, 60% becomes the cost used to read the prefix. Then, when this is evicted, you could delete it entirely and then, when the user returns, recalculate the KV cache. Or CPU DRAM, or send it to storage, and then read it back in. When comparing those two, if you ask which is better, in almost all cases, it is better to put it somewhere far away and read it back in. Recomputing it takes a long time and costs a lot, whereas reading it back takes some time but is much shorter than that, so it is more advantageous, and that is the direction we are moving in.
 
 
 ## Reloading KV Cache Instead of Recomputing and Hierarchical Memory    *90:10*
+
+
+![Presentation slide 58: Agentic AI · Design](/episodes/ep112/slide_58.jpg)
 
 <span class="paragraph-timestamp" data-ts="91:07">91:07</span> **Jinwon Lee** And while reading it back in, if you can perform some computation, that latency can be completely hidden, which is even better. That's the idea. Now we also need to use memory hierarchically, SRAM, HBM, DDR, SSDs or things like high-bandwidth flash are being discussed a lot these days, and it is important to divide up all of these roles well for the intermediate results of the KV cache, scheduling how and when to send them where, and when to bring them back is newly emerging as something extremely important in agentic AI. Then more open-source tools that do this well, software such as vLLM or SGLang mentioned earlier, will emerge going forward. So the bottleneck moves from compute to memory, then to power, continually going back and forth like this, and the answer changes each time, and whenever there is a bottleneck in one area, people try to solve it by whatever means they can. That's what I wanted to share today.
 
@@ -491,6 +637,9 @@ series: "main"
 
 
 ## The Future of Heterogeneous Computing Combining GPUs and LPUs    *94:21*
+
+
+![Presentation slide 63: AI semiconductors · Roofline](/episodes/ep112/slide_63.jpg)
 
 <span class="paragraph-timestamp" data-ts="94:24">94:24</span> **Jinwon Lee** That's a very good question, and the reason NVIDIA acquired Groq is that I tried drawing the roofline graph mentioned earlier as a graph for hardware, including a wide variety of AI semiconductors and GPUs. The Vera Rubin that I highlighted here looks like this, while Groq looks like this. As we saw earlier, lower down, you can tell that this one has much higher bandwidth because it is positioned higher up. So earlier, I mentioned prefill-decode disaggregation, and in the Vera Rubin family, they call that LPX. The role of LPX is that, even with disaggregation, the prefill is all done on Rubin GPUs, and decoding is also done on Rubin GPUs through attention, with only the FFN handled by Groq's LPX. But its arithmetic intensity ridge point is shown here as 8. That is a single-digit number. So compared with this blue one, this red graph is higher up, in regions where arithmetic intensity is relatively not that high, which is where Groq's LPU has an advantage. So InferenceX mentioned earlier is also positioned in that region on the right.
 
