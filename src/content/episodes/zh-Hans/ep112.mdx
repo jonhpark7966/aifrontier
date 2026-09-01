@@ -1,6 +1,6 @@
 ---
 episodeNumber: 112
-title: "GPU 内部发生了什么：从 KV cache 到 roofline"
+title: "AI 芯片内部发生了什么：从 KV cache 到 roofline"
 description: "本期是与 HyperAccel CTO 李晋源一起从头到尾梳理 LLM inference 核心原理的进阶课程。我们将循序渐进地讲解 prefill 与 decode 的区别、KV cache 的容量问题，以及如何通过 arithmetic intensity 和 roofline analysis 理解 decode 为何必然受到 memory-bound 限制，并介绍如何解读 SemiAnalysis InferenceX 基准中的 interactivity–throughput Pareto curve。随后，我们还将探讨 continuous batching、PagedAttention、chunked prefill、speculative decoding、prefill-decode disaggregation 等已应用于实际 production 的优化技术，以及在 agentic AI 时代，KV cache 管理为何会成为新的瓶颈。最后，我们还会聊到采用 LPDDR 的低功耗、低成本 AI 芯片 Bertha，以及 OpenAI Jalapeño、NVIDIA 收购 Groq 所预示的 heterogeneous computing 未来。"
 publishedAt: 2026-09-01
 duration: "1:44:10"
