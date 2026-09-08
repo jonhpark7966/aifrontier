@@ -4,6 +4,8 @@
 
 ## Git 커밋 규칙
 
+EP113은 `publish/ep113-20260909` 브랜치에 게시 원고를 보관하고 `.github/workflows/publish-ep113.yml`이 2026-09-09 07:00 KST에 4언어를 배포한다. 06:55 사전 빌드와 07:05 재시도 트리거가 있으며 UTC 날짜 가드로 다음 해 실행은 차단된다. `workflow_dispatch`의 기본 `dry_run=true`는 빌드·SSH 접근만 확인한다. 배포 후에만 원고를 main에 기록하므로 예약 시각 전에 이 브랜치를 main에 병합하지 않는다.
+
 - Co-Authored-By 표기 금지
 - 커밋 메시지는 한 줄로 작성
 
