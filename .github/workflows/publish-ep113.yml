@@ -79,7 +79,8 @@ jobs:
         run: |
           rsync -avz --delete dist/ chester@aifrontier.kr:/home/chester/aifrontier/
           for lang in ko en ja zh-Hans; do
-            curl -fsS "https://aifrontier.kr/$lang/episodes/ep113/?release=20260909" | grep -q 'PMUIi-2Nhlo'
+            curl -fsS "https://aifrontier.kr/$lang/episodes/ep113/?release=20260909" -o "/tmp/ep113-$lang.html"
+            grep -q 'PMUIi-2Nhlo' "/tmp/ep113-$lang.html"
           done
       - name: Record published sources on main
         if: steps.gate.outputs.run == 'true' && inputs.dry_run != true
